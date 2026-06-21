@@ -11,10 +11,21 @@ import androidx.core.graphics.Insets;
 
 import com.google.android.material.card.MaterialCardView;
 import com.mrdeveloper.mytourplan.R;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
-import com.mrdeveloper.mytourplan.models.Expense;
-import com.mrdeveloper.mytourplan.models.Trip;
+import com.mrdeveloper.mytourplan.api.ApiClient;
+import com.mrdeveloper.mytourplan.api.ApiService;
+import com.mrdeveloper.mytourplan.models.ExpenseTrackerResponse;
+import com.mrdeveloper.mytourplan.utils.NetworkUtils;
+import com.mrdeveloper.mytourplan.utils.SharedPrefs;
+import android.widget.Toast;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import com.mrdeveloper.mytourplan.adapters.ContributorAdapter;
+import com.mrdeveloper.mytourplan.models.Contributor;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class CalculationActivity extends AppCompatActivity {
@@ -22,7 +33,8 @@ public class CalculationActivity extends AppCompatActivity {
     private TextView tvPerPersonCost, tvMembers, tvBudgetPerPerson, tvTotalExpense;
     private TextView tvResultTitle, tvResultAmount;
     private MaterialCardView cardResult;
-    private DatabaseHelper db;
+    private androidx.recyclerview.widget.RecyclerView rvContributors;
+    private SharedPrefs sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +47,7 @@ public class CalculationActivity extends AppCompatActivity {
             return insets;
         });
 
-        db = new DatabaseHelper(this);
+        sharedPrefs = new SharedPrefs(this);
         int tripId = getIntent().getIntExtra("trip_id", -1);
 
         tvPerPersonCost = findViewById(R.id.tvPerPersonCost);
@@ -45,46 +57,77 @@ public class CalculationActivity extends AppCompatActivity {
         tvResultTitle = findViewById(R.id.tvResultTitle);
         tvResultAmount = findViewById(R.id.tvResultAmount);
         cardResult = findViewById(R.id.cardResult);
+        rvContributors = findViewById(R.id.rvContributors);
+        rvContributors.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
 
         calculate(tripId);
     }
 
     private void calculate(int tripId) {
-        Trip trip = db.getTripById(String.valueOf(tripId));
-        if (trip == null) return;
-
-        List<Expense> expenses = db.getExpensesByTrip(String.valueOf(tripId));
-        double totalExpense = 0;
-        for (Expense exp : expenses) {
-            totalExpense += exp.getAmount();
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        int members = trip.getMembersCount();
-        double budgetPerPerson = trip.getBudget();
-        double perPersonExpense = members > 0 ? (totalExpense / members) : 0;
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sharedPrefs.getToken();
 
-        tvMembers.setText(String.valueOf(members));
-        tvBudgetPerPerson.setText("৳" + String.format("%.2f", budgetPerPerson));
-        tvTotalExpense.setText("৳" + String.format("%.2f", totalExpense));
-        tvPerPersonCost.setText("৳" + String.format("%.2f", perPersonExpense));
+        apiService.getExpenseTracker("Bearer " + token, String.valueOf(tripId)).enqueue(new Callback<ExpenseTrackerResponse>() {
+            @Override
+            public void onResponse(Call<ExpenseTrackerResponse> call, Response<ExpenseTrackerResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ExpenseTrackerResponse data = response.body();
+                    if (data.getError() == null || data.getError().isEmpty()) {
+                        double totalExpense = data.getTotalSpent();
+                        double totalBudget = data.getTotalBudget();
+                        
+                        // Parse budget string "X Travelers x Y BDT"
+                        int members = 0;
+                        double budgetPerPerson = 0;
+                        try {
+                            String bs = data.getBudgetString();
+                            String[] parts = bs.split(" x ");
+                            members = Integer.parseInt(parts[0].split(" ")[0]);
+                            budgetPerPerson = Double.parseDouble(parts[1].split(" ")[0].replace(",", ""));
+                        } catch (Exception e) {}
 
-        double diff = budgetPerPerson - perPersonExpense;
+                        double perPersonExpense = members > 0 ? (totalExpense / members) : 0;
 
-        if (diff > 0) {
-            // Under budget, need to refund
-            tvResultTitle.setText("সবাইকে ফেরত দিতে হবে (জনপ্রতি)");
-            tvResultAmount.setText("৳" + String.format("%.2f", diff));
-            cardResult.setCardBackgroundColor(Color.parseColor("#4CAF50")); // Green
-        } else if (diff < 0) {
-            // Over budget, need to collect
-            tvResultTitle.setText("সবার থেকে আরও তুলতে হবে (জনপ্রতি)");
-            tvResultAmount.setText("৳" + String.format("%.2f", Math.abs(diff)));
-            cardResult.setCardBackgroundColor(Color.parseColor("#F44336")); // Red
-        } else {
-            // Exact
-            tvResultTitle.setText("হিসাব বরাবর (ফেরত বা দেওয়া লাগবে না)");
-            tvResultAmount.setText("৳0.00");
-            cardResult.setCardBackgroundColor(Color.parseColor("#0582CA")); // Blue
-        }
+                        tvMembers.setText(String.valueOf(members));
+                        tvBudgetPerPerson.setText("৳" + String.format("%.2f", budgetPerPerson));
+                        tvTotalExpense.setText("৳" + String.format("%.2f", totalExpense));
+                        tvPerPersonCost.setText("৳" + String.format("%.2f", perPersonExpense));
+
+                        double diff = budgetPerPerson - perPersonExpense;
+
+                        if (diff > 0) {
+                            tvResultTitle.setText("সবাইকে ফেরত দিতে হবে (জনপ্রতি)");
+                            tvResultAmount.setText("৳" + String.format("%.2f", diff));
+                            cardResult.setCardBackgroundColor(Color.parseColor("#4CAF50")); // Green
+                        } else if (diff < 0) {
+                            tvResultTitle.setText("সবার থেকে আরও তুলতে হবে (জনপ্রতি)");
+                            tvResultAmount.setText("৳" + String.format("%.2f", Math.abs(diff)));
+                            cardResult.setCardBackgroundColor(Color.parseColor("#F44336")); // Red
+                        } else {
+                            tvResultTitle.setText("হিসাব বরাবর (ফেরত বা দেওয়া লাগবে না)");
+                            tvResultAmount.setText("৳0.00");
+                            cardResult.setCardBackgroundColor(Color.parseColor("#0582CA")); // Blue
+                        }
+
+                        if (data.getContributors() != null) {
+                            ContributorAdapter adapter = new ContributorAdapter(data.getContributors());
+                            rvContributors.setAdapter(adapter);
+                        }
+                    } else {
+                        Toast.makeText(CalculationActivity.this, data.getError(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ExpenseTrackerResponse> call, Throwable t) {
+                Toast.makeText(CalculationActivity.this, "Failed to load calculation", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -3,7 +3,9 @@ package com.mrdeveloper.mytourplan.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import com.bumptech.glide.Glide;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,10 +17,18 @@ import java.util.List;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder> {
 
-    private List<Trip> trips;
+    public interface OnTripActionListener {
+        void onEditClick(Trip trip);
+        void onDeleteClick(Trip trip);
+        void onTripClick(Trip trip);
+    }
 
-    public TripAdapter(List<Trip> trips) {
+    private List<Trip> trips;
+    private OnTripActionListener listener;
+
+    public TripAdapter(List<Trip> trips, OnTripActionListener listener) {
         this.trips = trips;
+        this.listener = listener;
     }
 
     public void setTrips(List<Trip> trips) {
@@ -42,16 +52,27 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         holder.tvMembers.setText(trip.getMembersCount() + " People");
         holder.tvBudget.setText("৳ " + trip.getBudget());
 
+        String imageUri = trip.getImageUri();
+        if (imageUri != null && !imageUri.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUri)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_no_image)
+                    .into(holder.ivTripCover);
+        } else {
+            holder.ivTripCover.setImageResource(R.drawable.ic_no_image);
+        }
+
+        holder.btnEdit.setOnClickListener(v -> {
+            if (listener != null) listener.onEditClick(trip);
+        });
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) listener.onDeleteClick(trip);
+        });
+
         holder.itemView.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(v.getContext(), com.mrdeveloper.mytourplan.activities.TripDashboardActivity.class);
-            try {
-                intent.putExtra("trip_id", Integer.parseInt(trip.getId()));
-                intent.putExtra("members", trip.getMembersCount());
-                intent.putExtra("budget", trip.getBudget());
-            } catch (NumberFormatException e) {
-                // Handle parsing error if necessary
-            }
-            v.getContext().startActivity(intent);
+            if (listener != null) listener.onTripClick(trip);
         });
     }
 
@@ -62,6 +83,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
 
     static class TripViewHolder extends RecyclerView.ViewHolder {
         TextView tvDestination, tvDates, tvStatus, tvMembers, tvBudget;
+        ImageView ivTripCover, btnEdit, btnDelete;
 
         public TripViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -70,6 +92,9 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvMembers = itemView.findViewById(R.id.tvMembers);
             tvBudget = itemView.findViewById(R.id.tvBudget);
+            ivTripCover = itemView.findViewById(R.id.ivTripCover);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

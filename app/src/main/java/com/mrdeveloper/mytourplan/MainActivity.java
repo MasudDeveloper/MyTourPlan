@@ -5,9 +5,15 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
+import android.app.AlertDialog;
+import android.view.View;
+import android.widget.Button;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mrdeveloper.mytourplan.activities.LoginActivity;
@@ -67,6 +73,36 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit();
         }
+
+        // Custom Exit Dialog
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showCustomExitDialog();
+            }
+        });
+    }
+
+    private void showCustomExitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_exit_confirmation, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        Button btnCancel = view.findViewById(R.id.btnCancelExit);
+        Button btnConfirm = view.findViewById(R.id.btnConfirmExit);
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
+            finishAffinity();
+        });
+
+        dialog.show();
     }
 
     public void switchToMyTrips() {

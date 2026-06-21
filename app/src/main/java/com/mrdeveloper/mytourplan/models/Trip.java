@@ -36,6 +36,7 @@ public class Trip {
     // Local Sync fields
     private int isSynced; // 1 = true, 0 = false
     private String syncAction; // "INSERT", "UPDATE", "DELETE"
+    private int serverId;
 
     public Trip() {}
 
@@ -87,4 +88,7 @@ public class Trip {
 
     public String getSyncAction() { return syncAction; }
     public void setSyncAction(String syncAction) { this.syncAction = syncAction; }
+
+    public int getServerId() { return serverId; }
+    public void setServerId(int serverId) { this.serverId = serverId; }
 }

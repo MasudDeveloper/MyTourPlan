@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo json_encode(["error" => "Trip ID and Category are required"]);
                 exit;
             }
-            $stmt = $conn->prepare("INSERT INTO expenses (trip_id, category, amount, note, created_at) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO expenses (trip_id, category, amount, note, date) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$trip_id, $category, $amount, $note, $created_at]);
             $new_server_id = $conn->lastInsertId();
             echo json_encode(["success" => true, "server_id" => $new_server_id, "local_id" => $local_id, "message" => "Expense inserted"]);

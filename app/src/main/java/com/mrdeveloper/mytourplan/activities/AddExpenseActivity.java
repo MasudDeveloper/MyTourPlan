@@ -12,16 +12,23 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
 
 import com.mrdeveloper.mytourplan.R;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
-import com.mrdeveloper.mytourplan.models.Expense;
+import com.mrdeveloper.mytourplan.api.ApiClient;
+import com.mrdeveloper.mytourplan.api.ApiService;
+import com.mrdeveloper.mytourplan.models.SyncGenericResponse;
+import com.mrdeveloper.mytourplan.utils.NetworkUtils;
+import com.mrdeveloper.mytourplan.utils.SharedPrefs;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddExpenseActivity extends AppCompatActivity {
 
     private EditText etCategory, etAmount, etNote;
     private Button btnSaveExpense;
-    private DatabaseHelper db;
     private int tripId;
     private String expenseId;
+    private SharedPrefs sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +41,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             return insets;
         });
 
-        db = new DatabaseHelper(this);
+        sharedPrefs = new SharedPrefs(this);
         tripId = getIntent().getIntExtra("trip_id", -1);
 
         if (tripId == -1) {
@@ -52,12 +59,9 @@ public class AddExpenseActivity extends AppCompatActivity {
         
         if (expenseId != null) {
             btnSaveExpense.setText("Update Expense");
-            Expense existingExp = db.getExpenseById(expenseId);
-            if (existingExp != null) {
-                etCategory.setText(existingExp.getCategory());
-                etAmount.setText(String.valueOf(existingExp.getAmount()));
-                etNote.setText(existingExp.getNote());
-            }
+            etCategory.setText(getIntent().getStringExtra("category"));
+            etAmount.setText(String.valueOf(getIntent().getDoubleExtra("amount", 0.0)));
+            etNote.setText(getIntent().getStringExtra("note"));
         }
 
         btnSaveExpense.setOnClickListener(v -> saveExpense());
@@ -75,25 +79,40 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         double amount = Double.parseDouble(amountStr);
 
-        Expense exp = new Expense();
-        exp.setTripId(String.valueOf(tripId));
-        exp.setCategory(category);
-        exp.setAmount(amount);
-        exp.setNote(note);
-
-        if (expenseId != null) {
-            exp.setId(expenseId);
-            db.updateExpenseLocally(exp);
-            Toast.makeText(this, "খরচ আপডেট করা হয়েছে!", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            long result = db.addExpenseLocally(exp);
-            if (result != -1) {
-                Toast.makeText(this, "খরচ যোগ করা হয়েছে!", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(this, "খরচ যোগ করা যায়নি", Toast.LENGTH_SHORT).show();
-            }
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        btnSaveExpense.setEnabled(false);
+        btnSaveExpense.setText("Saving...");
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sharedPrefs.getToken();
+
+        String action = expenseId != null ? "UPDATE" : "INSERT";
+        int serverId = expenseId != null ? Integer.parseInt(expenseId) : -1;
+        String createdAt = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+
+        apiService.syncExpense("Bearer " + token, String.valueOf(tripId), category, amount, note, createdAt, "", action, serverId).enqueue(new Callback<SyncGenericResponse>() {
+            @Override
+            public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(AddExpenseActivity.this, "খরচ সেভ করা হয়েছে!", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    btnSaveExpense.setEnabled(true);
+                    btnSaveExpense.setText(expenseId != null ? "Update Expense" : "Save Expense");
+                    Toast.makeText(AddExpenseActivity.this, "খরচ সেভ করা যায়নি", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
+                btnSaveExpense.setEnabled(true);
+                btnSaveExpense.setText(expenseId != null ? "Update Expense" : "Save Expense");
+                Toast.makeText(AddExpenseActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

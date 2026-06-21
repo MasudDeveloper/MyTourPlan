@@ -130,7 +130,27 @@
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginVertical="8dp"/>
                 <LinearLayout android:id="@+id/llManualSync" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingVertical="8dp">
                     <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/stat_notify_sync" app:tint="@color/primaryColor" android:layout_marginEnd="16dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Manual Sync" android:textSize="14sp" android:textColor="@color/textColorPrimary"/>
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Manual Sync" android:textSize="14sp" android:textColor="@color/textColorPrimary"/>
+                    <TextView android:id="@+id/tvSyncStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="UPDATED" android:textSize="10sp" android:textColor="#64748B" android:background="#F1F5F9" android:paddingHorizontal="8dp" android:paddingVertical="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/llSyncProgress" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:paddingTop="8dp">
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressSync"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        app:indicatorColor="@color/primaryColor"
+                        app:trackCornerRadius="4dp" />
+                    <TextView
+                        android:id="@+id/tvSyncProgressText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Syncing..."
+                        android:textSize="12sp"
+                        android:textColor="@color/textColorMuted"
+                        android:gravity="end"
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

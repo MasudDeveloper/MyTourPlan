@@ -62,10 +62,6 @@ public class SyncWorker extends Worker {
     public Result doWork() {
         Log.d(TAG, "Starting sync process...");
         Context context = getApplicationContext();
-        
-        Intent startIntent = new Intent("com.mrdeveloper.mytourplan.SYNC_STATE_CHANGED");
-        startIntent.putExtra("is_syncing", true);
-        context.sendBroadcast(startIntent);
 
         DatabaseHelper db = new DatabaseHelper(context);
         com.mrdeveloper.mytourplan.utils.SharedPrefs prefs = new com.mrdeveloper.mytourplan.utils.SharedPrefs(context);
@@ -74,7 +70,28 @@ public class SyncWorker extends Worker {
 
         boolean success = true;
 
+        Intent startIntent = new Intent("com.mrdeveloper.mytourplan.SYNC_STATE_CHANGED");
+        startIntent.putExtra("is_syncing", true);
+        context.sendBroadcast(startIntent);
+
         List<Trip> unsyncedTrips = db.getUnsyncedTrips();
+        List<Expense> unsyncedExpenses = db.getUnsyncedExpenses();
+        List<com.mrdeveloper.mytourplan.models.TripMember> unsyncedMembers = db.getUnsyncedMembers();
+        
+        int totalItems = unsyncedTrips.size() + unsyncedExpenses.size() + unsyncedMembers.size();
+        int currentItem = 0;
+        
+        if (totalItems == 0) {
+            // Fake a tiny delay so user sees the progress bar validating
+            try { Thread.sleep(800); } catch (InterruptedException e) {}
+            
+            broadcastProgress(context, 100);
+            Intent endIntent = new Intent("com.mrdeveloper.mytourplan.SYNC_STATE_CHANGED");
+            endIntent.putExtra("is_syncing", false);
+            context.sendBroadcast(endIntent);
+            return Result.success();
+        }
+        
         if (!unsyncedTrips.isEmpty()) {
             Log.d(TAG, "Found " + unsyncedTrips.size() + " unsynced trips.");
             for (Trip t : unsyncedTrips) {
@@ -90,15 +107,18 @@ public class SyncWorker extends Worker {
                     okhttp3.RequestBody localId = okhttp3.RequestBody.create(okhttp3.MediaType.parse("text/plain"), t.getId());
 
                     // Image handling omitted for simplicity in background worker to avoid URI permission crashes
-                    okhttp3.MultipartBody.Part imagePart = null;
+                    // Retrofit does not allow null for @Part parameters, so we pass a dummy empty part.
+                    okhttp3.RequestBody emptyFileBody = okhttp3.RequestBody.create(okhttp3.MediaType.parse("image/*"), new byte[0]);
+                    okhttp3.MultipartBody.Part imagePart = okhttp3.MultipartBody.Part.createFormData("image", "", emptyFileBody);
 
                     retrofit2.Response<com.mrdeveloper.mytourplan.models.SyncTripResponse> response = apiService.syncTrip(
                             token, userId, fromLocation, destination, startDate, endDate, membersCount, budget, status, localId, imagePart
                     ).execute();
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        db.markTripAsSynced(t.getId());
-                        Log.d(TAG, "Synced Trip ID: " + t.getId());
+                        int newServerId = response.body().getServerId();
+                        db.markTripAsSynced(t.getId(), newServerId);
+                        Log.d(TAG, "Synced Trip ID: " + t.getId() + " with Server ID: " + newServerId);
                     } else {
                         success = false;
                         Log.e(TAG, "Failed to sync Trip ID: " + t.getId());
@@ -107,16 +127,25 @@ public class SyncWorker extends Worker {
                     Log.e(TAG, "Exception syncing trip", e);
                     success = false;
                 }
+                currentItem++;
+                broadcastProgress(context, (int) ((currentItem / (float) totalItems) * 100));
             }
         }
 
-        List<Expense> unsyncedExpenses = db.getUnsyncedExpenses();
+        unsyncedExpenses = db.getUnsyncedExpenses();
         if (!unsyncedExpenses.isEmpty()) {
             Log.d(TAG, "Found " + unsyncedExpenses.size() + " unsynced expenses.");
             for (Expense exp : unsyncedExpenses) {
                 try {
+                    Trip parentTrip = db.getTripById(exp.getTripId());
+                    if (parentTrip == null || parentTrip.getServerId() == -1) {
+                        Log.d(TAG, "Skipping Expense ID: " + exp.getId() + " because parent trip is not synced yet.");
+                        continue;
+                    }
+                    String serverTripId = String.valueOf(parentTrip.getServerId());
+
                     retrofit2.Response<com.mrdeveloper.mytourplan.models.SyncGenericResponse> response = apiService.syncExpense(
-                            token, exp.getTripId(), exp.getCategory(), exp.getAmount(), exp.getNote(), exp.getCreatedAt(), exp.getId(), exp.getSyncAction(), exp.getServerId()
+                            token, serverTripId, exp.getCategory(), exp.getAmount(), exp.getNote(), exp.getCreatedAt(), exp.getId(), exp.getSyncAction(), exp.getServerId()
                     ).execute();
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -136,6 +165,47 @@ public class SyncWorker extends Worker {
                     Log.e(TAG, "Exception syncing expense", e);
                     success = false;
                 }
+                currentItem++;
+                broadcastProgress(context, (int) ((currentItem / (float) totalItems) * 100));
+            }
+        }
+
+        // Sync Members
+        unsyncedMembers = db.getUnsyncedMembers();
+        if (!unsyncedMembers.isEmpty()) {
+            Log.d(TAG, "Found " + unsyncedMembers.size() + " unsynced members.");
+            for (com.mrdeveloper.mytourplan.models.TripMember member : unsyncedMembers) {
+                try {
+                    Trip parentTrip = db.getTripById(member.getTripId());
+                    if (parentTrip == null || parentTrip.getServerId() == -1) {
+                        Log.d(TAG, "Skipping Member ID: " + member.getId() + " because parent trip is not synced yet.");
+                        continue;
+                    }
+                    String serverTripId = String.valueOf(parentTrip.getServerId());
+
+                    retrofit2.Response<com.mrdeveloper.mytourplan.models.SyncGenericResponse> response = apiService.syncMember(
+                            token, serverTripId, member.getName(), member.getAmountPaid(), member.getPaymentMethod(), member.getId(), member.getSyncAction(), member.getServerId()
+                    ).execute();
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        if ("DELETE".equals(member.getSyncAction())) {
+                            db.permanentlyDeleteMember(member.getId());
+                            Log.d(TAG, "Permanently deleted Member ID: " + member.getId());
+                        } else {
+                            int newServerId = response.body().getServerId();
+                            db.markMemberAsSynced(member.getId(), newServerId != 0 ? newServerId : member.getServerId());
+                            Log.d(TAG, "Synced Member ID: " + member.getId());
+                        }
+                    } else {
+                        success = false;
+                        Log.e(TAG, "Failed to sync Member ID: " + member.getId());
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Exception syncing member", e);
+                    success = false;
+                }
+                currentItem++;
+                broadcastProgress(context, (int) ((currentItem / (float) totalItems) * 100));
             }
         }
 
@@ -145,5 +215,11 @@ public class SyncWorker extends Worker {
 
         Log.d(TAG, "Sync process completed.");
         return success ? Result.success() : Result.retry();
+    }
+    
+    private void broadcastProgress(Context context, int percentage) {
+        Intent intent = new Intent("com.mrdeveloper.mytourplan.SYNC_PROGRESS");
+        intent.putExtra("progress", percentage);
+        context.sendBroadcast(intent);
     }
 }

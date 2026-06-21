@@ -16,23 +16,28 @@ import android.content.IntentFilter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mrdeveloper.mytourplan.R;
-import com.mrdeveloper.mytourplan.activities.TripDashboardActivity;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
+import com.mrdeveloper.mytourplan.api.ApiClient;
+import com.mrdeveloper.mytourplan.api.ApiService;
+import com.mrdeveloper.mytourplan.models.DashboardResponse;
 import com.mrdeveloper.mytourplan.models.Trip;
 import com.mrdeveloper.mytourplan.models.User;
+import com.mrdeveloper.mytourplan.utils.NetworkUtils;
 import com.mrdeveloper.mytourplan.utils.SharedPrefs;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
     private TextView tvWelcome, tvUpcomingDest, tvUpcomingDates, tvUpcomingTime, tvUpcomingMembers, tvUpcomingBudget;
-    private ImageView ivProfileTop, ivUpcomingTrip, ivSyncStatus;
-    private ObjectAnimator syncAnimator;
-    private DatabaseHelper db;
+    private ImageView ivProfileTop, ivUpcomingTrip;
     private SharedPrefs sharedPrefs;
 
     @Nullable
@@ -40,11 +45,9 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         
-        db = new DatabaseHelper(getContext());
         sharedPrefs = new SharedPrefs(getContext());
 
         ivProfileTop = view.findViewById(R.id.ivProfileTop);
-        ivSyncStatus = view.findViewById(R.id.ivSyncStatus);
         ImageView ivHeroImage = view.findViewById(R.id.ivHeroImage);
         ivUpcomingTrip = view.findViewById(R.id.ivUpcomingTrip);
         tvWelcome = view.findViewById(R.id.tvWelcome);
@@ -101,93 +104,89 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private BroadcastReceiver syncReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean isSyncing = intent.getBooleanExtra("is_syncing", false);
-            if (ivSyncStatus != null) {
-                if (isSyncing) {
-                    ivSyncStatus.setVisibility(View.VISIBLE);
-                    if (syncAnimator == null) {
-                        syncAnimator = ObjectAnimator.ofFloat(ivSyncStatus, "rotation", 0f, 360f);
-                        syncAnimator.setDuration(1000);
-                        syncAnimator.setRepeatCount(ObjectAnimator.INFINITE);
-                    }
-                    if (!syncAnimator.isRunning()) syncAnimator.start();
-                } else {
-                    ivSyncStatus.setVisibility(View.GONE);
-                    if (syncAnimator != null) syncAnimator.cancel();
-                }
-            }
-        }
-    };
-
     @Override
     public void onResume() {
         super.onResume();
         loadDashboardData();
-        if (getContext() != null) {
-            getContext().registerReceiver(syncReceiver, new IntentFilter("com.mrdeveloper.mytourplan.SYNC_STATE_CHANGED"), Context.RECEIVER_NOT_EXPORTED);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getContext() != null) {
-            try {
-                getContext().unregisterReceiver(syncReceiver);
-            } catch (Exception e) {}
-        }
-        if (syncAnimator != null) syncAnimator.cancel();
     }
 
     private void loadDashboardData() {
         if (getContext() == null) return;
-        int userId = sharedPrefs.getUserId();
-        
-        // Load User Profile
-        User user = db.getUserById(userId);
-        if (user != null) {
-            if (tvWelcome != null) tvWelcome.setText("Welcome back, " + user.getName());
-            if (user.getProfilePic() != null && !user.getProfilePic().isEmpty() && ivProfileTop != null) {
-                Glide.with(this).load(Uri.parse(user.getProfilePic())).into(ivProfileTop);
-            } else if (ivProfileTop != null) {
-                Glide.with(this).load("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80").into(ivProfileTop);
-            }
+
+        if (tvWelcome != null) tvWelcome.setText("Welcome back"); // Fallback text
+
+        if (!NetworkUtils.isNetworkAvailable(getContext())) {
+            Toast.makeText(getContext(), "You are offline.", Toast.LENGTH_SHORT).show();
+            showEmptyUpcomingTrip();
+            return;
         }
 
-        // Load Upcoming Trip
-        Trip upcoming = db.getUpcomingTrip(String.valueOf(userId));
-        if (upcoming != null) {
-            if (tvUpcomingDest != null) tvUpcomingDest.setText(upcoming.getDestination());
-            if (tvUpcomingDates != null) tvUpcomingDates.setText(upcoming.getStartDate() + " to " + upcoming.getEndDate());
-            if (tvUpcomingMembers != null) tvUpcomingMembers.setText(String.valueOf(upcoming.getMembersCount()) + " Members");
-            double totalBudget = upcoming.getBudget() * upcoming.getMembersCount();
-            if (tvUpcomingBudget != null) tvUpcomingBudget.setText(String.format("৳%.2f", totalBudget));
-            if (tvUpcomingTime != null) tvUpcomingTime.setText("08:00 AM"); // You can make this dynamic later if needed
-            
-            if (upcoming.getImageUri() != null && !upcoming.getImageUri().isEmpty() && ivUpcomingTrip != null) {
-                Glide.with(this).load(Uri.parse(upcoming.getImageUri())).into(ivUpcomingTrip);
-            } else if (ivUpcomingTrip != null) {
-                Glide.with(this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
+        String token = sharedPrefs.getToken();
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.getDashboard("Bearer " + token).enqueue(new Callback<DashboardResponse>() {
+            @Override
+            public void onResponse(Call<DashboardResponse> call, Response<DashboardResponse> response) {
+                if (!isAdded() || getContext() == null) return;
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    DashboardResponse data = response.body();
+                    
+                    if (data.getError() == null || data.getError().isEmpty()) {
+                        if (tvWelcome != null) tvWelcome.setText("Welcome back, " + data.getUserName());
+                        // Assume profile pic logic can be added to backend later, for now placeholder
+                        if (ivProfileTop != null) {
+                            Glide.with(HomeFragment.this).load("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80").into(ivProfileTop);
+                        }
+
+                        Trip upcoming = data.getUpcomingTrip();
+                        if (upcoming != null && upcoming.getId() != null) {
+                            if (tvUpcomingDest != null) tvUpcomingDest.setText(upcoming.getDestination());
+                            if (tvUpcomingDates != null) tvUpcomingDates.setText(upcoming.getStartDate() + " to " + upcoming.getEndDate());
+                            if (tvUpcomingMembers != null) tvUpcomingMembers.setText(String.valueOf(upcoming.getMembersCount()) + " Members");
+                            double totalBudget = upcoming.getBudget() * upcoming.getMembersCount();
+                            if (tvUpcomingBudget != null) tvUpcomingBudget.setText(String.format("৳%.2f", totalBudget));
+                            if (tvUpcomingTime != null) tvUpcomingTime.setText("08:00 AM"); 
+                            
+                            if (upcoming.getImageUri() != null && !upcoming.getImageUri().isEmpty() && ivUpcomingTrip != null) {
+                                Glide.with(HomeFragment.this).load(Uri.parse(upcoming.getImageUri())).into(ivUpcomingTrip);
+                            } else if (ivUpcomingTrip != null) {
+                                Glide.with(HomeFragment.this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
+                            }
+
+                            if (ivUpcomingTrip != null) {
+                                ivUpcomingTrip.setOnClickListener(v -> {
+                                    Intent intent = new Intent(getActivity(), com.mrdeveloper.mytourplan.activities.TripDashboardActivity.class);
+                                    try {
+                                        intent.putExtra("trip_id", Integer.parseInt(upcoming.getId()));
+                                        startActivity(intent);
+                                    } catch (NumberFormatException e) {}
+                                });
+                            }
+                        } else {
+                            showEmptyUpcomingTrip();
+                        }
+                    } else {
+                        showEmptyUpcomingTrip();
+                    }
+                } else {
+                    showEmptyUpcomingTrip();
+                }
             }
 
-            // Make upcoming trip clickable
-            if (ivUpcomingTrip != null) {
-                ivUpcomingTrip.setOnClickListener(v -> {
-                    Intent intent = new Intent(getActivity(), TripDashboardActivity.class);
-                    intent.putExtra("trip_id", Integer.parseInt(upcoming.getId()));
-                    startActivity(intent);
-                });
+            @Override
+            public void onFailure(Call<DashboardResponse> call, Throwable t) {
+                if (!isAdded() || getContext() == null) return;
+                showEmptyUpcomingTrip();
             }
-        } else {
-            if (tvUpcomingDest != null) tvUpcomingDest.setText("No upcoming trips");
-            if (tvUpcomingDates != null) tvUpcomingDates.setText("Plan your next adventure!");
-            if (ivUpcomingTrip != null) {
-                Glide.with(this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
-                ivUpcomingTrip.setOnClickListener(null);
-            }
+        });
+    }
+
+    private void showEmptyUpcomingTrip() {
+        if (tvUpcomingDest != null) tvUpcomingDest.setText("No upcoming trips");
+        if (tvUpcomingDates != null) tvUpcomingDates.setText("Plan your next adventure!");
+        if (ivUpcomingTrip != null) {
+            Glide.with(this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
+            ivUpcomingTrip.setOnClickListener(null);
         }
     }
 }

@@ -4,30 +4,46 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.bumptech.glide.Glide;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
 
 import com.mrdeveloper.mytourplan.R;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
-import com.mrdeveloper.mytourplan.models.Expense;
+import com.mrdeveloper.mytourplan.api.ApiClient;
+import com.mrdeveloper.mytourplan.api.ApiService;
+import com.mrdeveloper.mytourplan.models.GenericRequest;
+import com.mrdeveloper.mytourplan.models.GenericResponse;
+import com.mrdeveloper.mytourplan.models.TripDashboardResponse;
+import com.mrdeveloper.mytourplan.utils.NetworkUtils;
+import com.mrdeveloper.mytourplan.utils.SharedPrefs;
+import android.widget.Toast;
+import android.net.Uri;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.List;
 
 public class TripDashboardActivity extends AppCompatActivity {
 
-    private TextView tvTotalBudget, tvMembers, tvEmptyState;
-    private Button btnAddExpense, btnCalculate, btnViewItinerary;
+    private TextView tvTotalBudget, tvMembers, tvEmptyState, tvBudgetPercentage, tvTripDates;
+    private View btnAddExpense, btnCalculate, btnViewItinerary, btnGroupMembers, fabAddExpense;
     private LinearLayout layoutExpenseList;
-    private DatabaseHelper db;
+    private android.widget.ProgressBar budgetProgress;
+    private ImageView ivDashboardCover;
+    private CollapsingToolbarLayout collapsingToolbar;
+    private SharedPrefs sharedPrefs;
     private int tripId;
-    private int totalMembers;
-    private double budgetPerPerson;
-    private double totalExpense = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +56,7 @@ public class TripDashboardActivity extends AppCompatActivity {
             return insets;
         });
 
-        db = new DatabaseHelper(this);
+        sharedPrefs = new SharedPrefs(this);
         tripId = getIntent().getIntExtra("trip_id", -1);
 
         tvTotalBudget = findViewById(R.id.tvTotalBudget);
@@ -50,14 +66,36 @@ public class TripDashboardActivity extends AppCompatActivity {
         btnAddExpense = findViewById(R.id.btnAddExpense);
         btnCalculate = findViewById(R.id.btnCalculate);
         btnViewItinerary = findViewById(R.id.btnViewItinerary);
-
-        // Fetch Trip Details (Need to fetch it from DB actually, wait, we don't have getTripById in DatabaseHelper)
-        // Let's pass members and budget from AddTrip or just add getTripById.
-        // It's cleaner to add getTripById.
+        btnGroupMembers = findViewById(R.id.btnGroupMembers);
+        fabAddExpense = findViewById(R.id.fabAddExpense);
         
-        btnAddExpense.setOnClickListener(v -> {
+        tvBudgetPercentage = findViewById(R.id.tvBudgetPercentage);
+        tvTripDates = findViewById(R.id.tvTripDates);
+        budgetProgress = findViewById(R.id.budgetProgress);
+        ivDashboardCover = findViewById(R.id.ivDashboardCover);
+        collapsingToolbar = findViewById(R.id.collapsingToolbar);
+        
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+
+        View.OnClickListener addExpenseListener = v -> {
             Intent intent = new Intent(TripDashboardActivity.this, AddExpenseActivity.class);
             intent.putExtra("trip_id", tripId);
+            startActivity(intent);
+        };
+        
+        btnAddExpense.setOnClickListener(addExpenseListener);
+        fabAddExpense.setOnClickListener(addExpenseListener);
+
+        btnGroupMembers.setOnClickListener(v -> {
+            Intent intent = new Intent(TripDashboardActivity.this, GroupMembersActivity.class);
+            intent.putExtra("trip_id", String.valueOf(tripId));
             startActivity(intent);
         });
 
@@ -81,66 +119,116 @@ public class TripDashboardActivity extends AppCompatActivity {
     }
 
     private void loadTripData() {
-        com.mrdeveloper.mytourplan.models.Trip trip = db.getTripById(String.valueOf(tripId));
-        if (trip != null) {
-            totalMembers = trip.getMembersCount();
-            budgetPerPerson = trip.getBudget();
-        } else {
-            totalMembers = getIntent().getIntExtra("members", 1);
-            budgetPerPerson = getIntent().getDoubleExtra("budget", 0.0);
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            Toast.makeText(this, "You are offline", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        double totalBudget = totalMembers * budgetPerPerson;
-        tvMembers.setText(String.valueOf(totalMembers));
-        tvTotalBudget.setText("৳" + String.format("%.2f", totalBudget));
-
-        List<Expense> expenses = db.getExpensesByTrip(String.valueOf(tripId));
-        layoutExpenseList.removeAllViews();
-        totalExpense = 0;
-
-        if (expenses.isEmpty()) {
-            layoutExpenseList.addView(tvEmptyState);
-        } else {
-            for (Expense expense : expenses) {
-                totalExpense += expense.getAmount();
-                
-                TextView tv = new TextView(this);
-                tv.setText(expense.getCategory() + " - ৳" + expense.getAmount() + (expense.getNote().isEmpty() ? "" : " (" + expense.getNote() + ")"));
-                tv.setPadding(0, 16, 0, 16);
-                tv.setTextSize(16);
-                
-                tv.setOnLongClickListener(v -> {
-                    new android.app.AlertDialog.Builder(TripDashboardActivity.this)
-                        .setTitle("Manage Expense")
-                        .setItems(new CharSequence[]{"Edit", "Delete"}, (dialog, which) -> {
-                            if (which == 0) {
-                                Intent intent = new Intent(TripDashboardActivity.this, AddExpenseActivity.class);
-                                intent.putExtra("trip_id", tripId);
-                                intent.putExtra("expense_id", expense.getId());
-                                startActivity(intent);
-                            } else if (which == 1) {
-                                new android.app.AlertDialog.Builder(TripDashboardActivity.this)
-                                    .setTitle("Delete Expense")
-                                    .setMessage("Are you sure you want to delete this expense?")
-                                    .setPositiveButton("Yes", (d, w) -> {
-                                        db.deleteExpenseLocally(expense.getId());
-                                        loadTripData();
-                                    })
-                                    .setNegativeButton("No", null)
-                                    .show();
+        String token = sharedPrefs.getToken();
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.getTripDashboard("Bearer " + token, String.valueOf(tripId)).enqueue(new Callback<TripDashboardResponse>() {
+            @Override
+            public void onResponse(Call<TripDashboardResponse> call, Response<TripDashboardResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TripDashboardResponse data = response.body();
+                    if (data.getError() == null || data.getError().isEmpty()) {
+                        com.mrdeveloper.mytourplan.models.Trip trip = data.getTrip();
+                        if (trip != null) {
+                            int totalMembers = trip.getMembersCount();
+                            double budgetPerPerson = trip.getBudget();
+                            if (tvTripDates != null) tvTripDates.setText(trip.getStartDate() + " - " + trip.getEndDate());
+                            if (collapsingToolbar != null) collapsingToolbar.setTitle(trip.getDestination());
+                            
+                            if (ivDashboardCover != null && trip.getImageUri() != null && !trip.getImageUri().isEmpty()) {
+                                Glide.with(TripDashboardActivity.this).load(Uri.parse(trip.getImageUri())).centerCrop().into(ivDashboardCover);
                             }
-                        })
-                        .show();
-                    return true;
-                });
-                
-                layoutExpenseList.addView(tv);
-                
-                View divider = new View(this);
-                divider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1));
-                divider.setBackgroundColor(0xFFEEEEEE);
-                layoutExpenseList.addView(divider);
+
+                            double totalBudget = totalMembers * budgetPerPerson;
+                            tvMembers.setText("+" + totalMembers);
+                            tvTotalBudget.setText("৳" + String.format("%.2f", totalBudget));
+
+                            List<com.mrdeveloper.mytourplan.models.Expense> expenses = data.getExpenses();
+                            layoutExpenseList.removeAllViews();
+                            double totalExpense = 0;
+
+                            if (expenses == null || expenses.isEmpty()) {
+                                layoutExpenseList.addView(tvEmptyState);
+                            } else {
+                                for (com.mrdeveloper.mytourplan.models.Expense expense : expenses) {
+                                    totalExpense += expense.getAmount();
+                                    
+                                    View expenseView = getLayoutInflater().inflate(R.layout.item_expense_recent, layoutExpenseList, false);
+                                    TextView tvTitle = expenseView.findViewById(R.id.tvExpenseTitle);
+                                    TextView tvSubtitle = expenseView.findViewById(R.id.tvExpenseSubtitle);
+                                    TextView tvAmount = expenseView.findViewById(R.id.tvExpenseAmount);
+                                    
+                                    tvTitle.setText(expense.getCategory());
+                                    tvSubtitle.setText(expense.getNote() == null || expense.getNote().isEmpty() ? expense.getCategory() : expense.getNote());
+                                    tvAmount.setText("-৳" + String.format("%.2f", expense.getAmount()));
+                                    
+                                    expenseView.setOnLongClickListener(v -> {
+                                        new android.app.AlertDialog.Builder(TripDashboardActivity.this)
+                                            .setTitle("Manage Expense")
+                                            .setItems(new CharSequence[]{"Edit", "Delete"}, (dialog, which) -> {
+                                                if (which == 0) {
+                                                    Intent intent = new Intent(TripDashboardActivity.this, AddExpenseActivity.class);
+                                                    intent.putExtra("trip_id", tripId);
+                                                    intent.putExtra("expense_id", expense.getId());
+                                                    intent.putExtra("category", expense.getCategory());
+                                                    intent.putExtra("amount", expense.getAmount());
+                                                    intent.putExtra("note", expense.getNote());
+                                                    startActivity(intent);
+                                                } else if (which == 1) {
+                                                    new android.app.AlertDialog.Builder(TripDashboardActivity.this)
+                                                        .setTitle("Delete Expense")
+                                                        .setMessage("Are you sure you want to delete this expense?")
+                                                        .setPositiveButton("Yes", (d, w) -> {
+                                                            ApiService service = ApiClient.getClient().create(ApiService.class);
+                                                            service.syncExpense("Bearer " + token, String.valueOf(tripId), "", 0, "", "", "", "DELETE", Integer.parseInt(expense.getId())).enqueue(new Callback<com.mrdeveloper.mytourplan.models.SyncGenericResponse>() {
+                                                                @Override
+                                                                public void onResponse(Call<com.mrdeveloper.mytourplan.models.SyncGenericResponse> c, Response<com.mrdeveloper.mytourplan.models.SyncGenericResponse> res) {
+                                                                    if (res.isSuccessful()) {
+                                                                        loadTripData();
+                                                                    } else {
+                                                                        Toast.makeText(TripDashboardActivity.this, "Failed to delete", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+                                                                @Override
+                                                                public void onFailure(Call<com.mrdeveloper.mytourplan.models.SyncGenericResponse> c, Throwable t) {
+                                                                    Toast.makeText(TripDashboardActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            });
+                                                        })
+                                                        .setNegativeButton("No", null)
+                                                        .show();
+                                                }
+                                            })
+                                            .show();
+                                        return true;
+                                    });
+                                    
+                                    layoutExpenseList.addView(expenseView);
+                                }
+                            }
+                            
+                            // Update Budget Progress
+                            int progress = 0;
+                            if (totalBudget > 0) {
+                                progress = (int) ((totalExpense / totalBudget) * 100);
+                            }
+                            tvBudgetPercentage.setText(progress + "% (৳" + String.format("%.0f", totalExpense) + ")");
+                            budgetProgress.setProgress(progress);
+                        }
+                    } else {
+                        Toast.makeText(TripDashboardActivity.this, data.getError(), Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Call<TripDashboardResponse> call, Throwable t) {
+                Toast.makeText(TripDashboardActivity.this, "Failed to load trip", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

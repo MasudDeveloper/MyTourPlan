@@ -44,6 +44,9 @@ public interface ApiService {
     @GET("get_expense_tracker.php")
     Call<ExpenseTrackerResponse> getExpenseTracker(@Header("Authorization") String token, @Query("trip_id") String tripId);
 
+    @GET("get_trip_dashboard.php")
+    Call<com.mrdeveloper.mytourplan.models.TripDashboardResponse> getTripDashboard(@Header("Authorization") String token, @Query("trip_id") String tripId);
+
     @GET("get_itinerary.php")
     Call<ItineraryResponse> getItinerary(@Header("Authorization") String token, @Query("trip_id") String tripId);
 
@@ -52,6 +55,38 @@ public interface ApiService {
 
     @POST("save_trip.php")
     Call<GenericResponse> saveTrip(@Header("Authorization") String token, @Body SaveTripRequest body);
+
+    @POST("delete_trip.php")
+    Call<GenericResponse> deleteTrip(@Header("Authorization") String token, @Body com.mrdeveloper.mytourplan.models.GenericRequest body);
+
+    @Multipart
+    @POST("add_trip.php")
+    Call<SyncTripResponse> addTrip(
+            @Header("Authorization") String token,
+            @Part("from_location") RequestBody fromLocation,
+            @Part("destination") RequestBody destination,
+            @Part("start_date") RequestBody startDate,
+            @Part("end_date") RequestBody endDate,
+            @Part("members_count") RequestBody membersCount,
+            @Part("budget") RequestBody budget,
+            @Part("status") RequestBody status,
+            @Part MultipartBody.Part image
+    );
+
+    @Multipart
+    @POST("update_trip.php")
+    Call<GenericResponse> updateTrip(
+            @Header("Authorization") String token,
+            @Part("trip_id") RequestBody tripId,
+            @Part("from_location") RequestBody fromLocation,
+            @Part("destination") RequestBody destination,
+            @Part("start_date") RequestBody startDate,
+            @Part("end_date") RequestBody endDate,
+            @Part("members_count") RequestBody membersCount,
+            @Part("budget") RequestBody budget,
+            @Part("status") RequestBody status,
+            @Part MultipartBody.Part image
+    );
 
     @Multipart
     @POST("sync_trip.php")
@@ -94,4 +129,20 @@ public interface ApiService {
             @Field("location") String location,
             @Field("local_id") String localId
     );
+
+    @FormUrlEncoded
+    @POST("sync_member.php")
+    Call<SyncGenericResponse> syncMember(
+            @Header("Authorization") String token,
+            @Field("trip_id") String tripId,
+            @Field("name") String name,
+            @Field("amount_paid") double amountPaid,
+            @Field("payment_method") String paymentMethod,
+            @Field("local_id") String localId,
+            @Field("action") String action,
+            @Field("server_id") int serverId
+    );
+    @GET("get_members.php")
+    Call<com.mrdeveloper.mytourplan.models.MembersResponse> getMembers(@Header("Authorization") String token, @Query("trip_id") String tripId);
+
 }

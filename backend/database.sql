@@ -55,6 +55,19 @@ CREATE TABLE IF NOT EXISTS `itinerary` (
 );
 
 -- --------------------------------------------------------
+-- Table structure for table `trip_members`
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `trip_members` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `trip_id` INT NOT NULL,
+  `name` VARCHAR(150) NOT NULL,
+  `amount_paid` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  `payment_method` VARCHAR(50) DEFAULT 'Cash',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`trip_id`) REFERENCES `trips`(`id`) ON DELETE CASCADE
+);
+
+-- --------------------------------------------------------
 -- Table structure for table `hotels` (For Generation Plan)
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hotels` (

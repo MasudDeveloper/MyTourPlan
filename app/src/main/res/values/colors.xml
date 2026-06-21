@@ -10,4 +10,5 @@
     <color name="textColorMuted">#757575</color>
     <color name="successColor">#00873E</color>
     <color name="dangerColor">#D32F2F</color>
+    <color name="white">#FFFFFF</color>
 </resources>

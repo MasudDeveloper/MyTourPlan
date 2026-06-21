@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json");
 require_once 'config.php';
 require_once 'jwt_helper.php';
 
@@ -21,36 +22,65 @@ if (!$trip_id) {
     exit();
 }
 
-// Fetch Trip Budget
-$stmt = $conn->prepare("SELECT budget FROM trips WHERE id = ? AND user_id = ?");
-$stmt->execute([$trip_id, $user->user_id]);
-$trip = $stmt->fetch(PDO::FETCH_ASSOC);
+// Fetch Trip Budget Info
+$stmtTrip = $conn->prepare("SELECT budget, members_count FROM trips WHERE id = ?");
+$stmtTrip->execute([$trip_id]);
+$trip = $stmtTrip->fetch(PDO::FETCH_ASSOC);
 
 if (!$trip) {
-    echo json_encode(["error" => "Trip not found or access denied"]);
+    echo json_encode(["error" => "Trip not found"]);
     exit();
 }
 
-// Fetch Expenses
-$stmtExp = $conn->prepare("SELECT * FROM expenses WHERE trip_id = ? ORDER BY date DESC");
+$budgetPerPerson = (float)$trip['budget'];
+$membersCount = (int)$trip['members_count'];
+$totalBudget = $budgetPerPerson * $membersCount;
+
+// Calculate Total Spent
+$stmtExp = $conn->prepare("SELECT SUM(amount) as total_spent FROM expenses WHERE trip_id = ?");
 $stmtExp->execute([$trip_id]);
-$expensesData = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
+$totalSpent = (float)$stmtExp->fetchColumn();
 
-$response = [
-    "total_budget" => (float)$trip['budget'],
-    "expenses" => []
-];
+// Fetch Members to calculate Due
+$stmtMembers = $conn->prepare("SELECT * FROM trip_members WHERE trip_id = ?");
+$stmtMembers->execute([$trip_id]);
+$membersData = $stmtMembers->fetchAll(PDO::FETCH_ASSOC);
 
-foreach ($expensesData as $exp) {
-    $response["expenses"][] = [
-        "id" => (string)$exp['id'],
-        "trip_id" => (string)$exp['trip_id'],
-        "category" => $exp['category'],
-        "amount" => (float)$exp['amount'],
-        "note" => $exp['note'],
-        "date" => $exp['date']
+$contributors = [];
+foreach ($membersData as $member) {
+    $amountPaid = (float)$member['amount_paid'];
+    $totalDue = $budgetPerPerson - $amountPaid;
+    $status = "Due";
+    
+    if ($totalDue <= 0) {
+        $status = "Paid";
+        $totalDue = 0;
+    }
+
+    $name = $member['name'];
+    $parts = explode(" ", trim($name));
+    if (count($parts) >= 2) {
+        $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
+    } else {
+        $initials = strtoupper(substr($name, 0, min(2, strlen($name))));
+    }
+
+    $contributors[] = [
+        "id" => (string)$member['id'],
+        "name" => $name,
+        "initials" => $initials,
+        "amount_paid" => $amountPaid,
+        "total_due" => $totalDue,
+        "status" => $status
     ];
 }
+
+$response = [
+    "total_budget" => $totalBudget,
+    "total_spent" => $totalSpent,
+    "budget_string" => $membersCount . " Travelers x " . number_format($budgetPerPerson, 0) . " BDT",
+    "contributors" => $contributors
+];
 
 echo json_encode($response);
 ?>

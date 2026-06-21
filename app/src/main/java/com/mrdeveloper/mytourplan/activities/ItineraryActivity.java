@@ -15,13 +15,19 @@ import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.mrdeveloper.mytourplan.R;
 import com.mrdeveloper.mytourplan.adapters.ItineraryTimelineAdapter;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
+import com.mrdeveloper.mytourplan.api.ApiClient;
+import com.mrdeveloper.mytourplan.api.ApiService;
 import com.mrdeveloper.mytourplan.models.ItineraryItem;
 import com.mrdeveloper.mytourplan.models.ItineraryResponse;
-import com.mrdeveloper.mytourplan.models.Trip;
+import com.mrdeveloper.mytourplan.utils.NetworkUtils;
+import com.mrdeveloper.mytourplan.utils.SharedPrefs;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +37,10 @@ public class ItineraryActivity extends AppCompatActivity {
     private TextView tvTotalBudget, tvDuration, tvTravelersCount;
     private RecyclerView rvItinerary;
     private ProgressBar progressBar;
-    private FloatingActionButton fabAddItinerary;
+    private ExtendedFloatingActionButton fabAddItinerary;
     private ItineraryTimelineAdapter adapter;
-    private DatabaseHelper db;
     private String tripId;
+    private SharedPrefs sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +56,7 @@ public class ItineraryActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
-        db = new DatabaseHelper(this);
+        sharedPrefs = new SharedPrefs(this);
 
         tvTotalBudget = findViewById(R.id.tvTotalBudget);
         tvDuration = findViewById(R.id.tvDuration);
@@ -82,20 +88,45 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     private void loadItinerary() {
-        progressBar.setVisibility(View.VISIBLE);
-        
-        Trip trip = db.getTripById(tripId);
-        if (trip != null) {
-            tvTotalBudget.setText(String.format("৳%.2f", trip.getBudget() * trip.getMembersCount()));
-            tvDuration.setText(trip.getStartDate() + " to " + trip.getEndDate());
-            tvTravelersCount.setText(trip.getMembersCount() + " Members");
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            Toast.makeText(this, "You are offline", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        List<ItineraryItem> items = db.getItineraryByTrip(tripId);
-
-        adapter = new ItineraryTimelineAdapter(items);
-        rvItinerary.setAdapter(adapter);
+        progressBar.setVisibility(View.VISIBLE);
         
-        progressBar.setVisibility(View.GONE);
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sharedPrefs.getToken();
+
+        apiService.getItinerary("Bearer " + token, tripId).enqueue(new Callback<ItineraryResponse>() {
+            @Override
+            public void onResponse(Call<ItineraryResponse> call, Response<ItineraryResponse> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    ItineraryResponse data = response.body();
+                    if (data.getError() == null || data.getError().isEmpty()) {
+                        tvTotalBudget.setText(data.getTotalBudget());
+                        tvDuration.setText(data.getDuration());
+                        tvTravelersCount.setText(data.getTravelersCount());
+
+                        List<ItineraryItem> items = data.getSchedule();
+                        if (items != null) {
+                            adapter = new ItineraryTimelineAdapter(items);
+                            rvItinerary.setAdapter(adapter);
+                        }
+                    } else {
+                        Toast.makeText(ItineraryActivity.this, data.getError(), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ItineraryActivity.this, "Failed to load itinerary", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ItineraryResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(ItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

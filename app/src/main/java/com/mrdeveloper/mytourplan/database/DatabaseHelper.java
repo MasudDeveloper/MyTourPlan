@@ -16,7 +16,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "MyTourPlan.db";
-    private static final int DATABASE_VERSION = 5; // Upgraded to fix missing columns
+    private static final int DATABASE_VERSION = 6; // Added Trip Members
 
     // Common Sync Columns
     private static final String COL_IS_SYNCED = "is_synced";
@@ -62,6 +62,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_ITIN_TIME = "time";
     private static final String COL_ITIN_ACTIVITY = "activity";
     private static final String COL_ITIN_LOCATION = "location";
+
+    // Trip Members Table
+    private static final String TABLE_TRIP_MEMBERS = "trip_members";
+    private static final String COL_MEMBER_ID = "id";
+    private static final String COL_MEMBER_TRIP_ID = "trip_id";
+    private static final String COL_MEMBER_NAME = "name";
+    private static final String COL_MEMBER_AMOUNT = "amount_paid";
+    private static final String COL_MEMBER_PAYMENT_METHOD = "payment_method";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -115,6 +123,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_ITIN_LOCATION + " TEXT, " +
                 COL_SERVER_ID + " INTEGER DEFAULT -1)";
         db.execSQL(createItineraryTable);
+
+        String createTripMembersTable = "CREATE TABLE " + TABLE_TRIP_MEMBERS + " (" +
+                COL_MEMBER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_MEMBER_TRIP_ID + " TEXT, " +
+                COL_MEMBER_NAME + " TEXT, " +
+                COL_MEMBER_AMOUNT + " REAL, " +
+                COL_MEMBER_PAYMENT_METHOD + " TEXT, " +
+                COL_IS_SYNCED + " INTEGER DEFAULT 0, " +
+                COL_SYNC_ACTION + " TEXT DEFAULT 'INSERT', " +
+                COL_SERVER_ID + " INTEGER DEFAULT -1)";
+        db.execSQL(createTripMembersTable);
     }
 
     @Override
@@ -123,6 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRIPS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITINERARY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRIP_MEMBERS);
         onCreate(db);
     }
 
@@ -230,11 +250,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_TRIPS, null, values);
     }
 
-    public void markTripAsSynced(String id) {
+    public boolean updateTripLocally(Trip trip) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_TRIP_FROM, trip.getFromLocation());
+        values.put(COL_TRIP_DESTINATION, trip.getDestination());
+        values.put(COL_TRIP_IMAGE, trip.getImageUri());
+        values.put(COL_TRIP_START_DATE, trip.getStartDate());
+        values.put(COL_TRIP_END_DATE, trip.getEndDate());
+        values.put(COL_TRIP_MEMBERS, trip.getMembersCount());
+        values.put(COL_TRIP_BUDGET, trip.getBudget());
+        values.put(COL_IS_SYNCED, 0);
+        values.put(COL_SYNC_ACTION, "UPDATE");
+        
+        int rows = db.update(TABLE_TRIPS, values, COL_TRIP_ID + "=?", new String[]{trip.getId()});
+        return rows > 0;
+    }
+
+    public void markTripAsSynced(String id, int serverId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_IS_SYNCED, 1);
         values.put(COL_SYNC_ACTION, "NONE");
+        if (serverId != -1) {
+            values.put(COL_SERVER_ID, serverId);
+        }
         db.update(TABLE_TRIPS, values, COL_TRIP_ID + "=?", new String[]{id});
     }
 
@@ -255,6 +295,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             t.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(COL_TRIP_STATUS)));
             t.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
             t.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+            t.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
             cursor.close();
             return t;
         }
@@ -265,7 +306,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Trip> getTripsByUser(String userId) {
         List<Trip> trips = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TRIPS + " WHERE " + COL_TRIP_USER_ID + "=? ORDER BY " + COL_TRIP_ID + " DESC", new String[]{userId});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TRIPS + " WHERE " + COL_TRIP_USER_ID + "=? AND " + COL_SYNC_ACTION + " != 'DELETE' ORDER BY " + COL_TRIP_ID + " DESC", new String[]{userId});
         if (cursor.moveToFirst()) {
             do {
                 Trip t = new Trip();
@@ -281,6 +322,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 t.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(COL_TRIP_STATUS)));
                 t.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
                 t.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+                t.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
                 trips.add(t);
             } while (cursor.moveToNext());
         }
@@ -306,6 +348,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             t.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(COL_TRIP_STATUS)));
             t.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
             t.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+            t.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
             cursor.close();
             return t;
         }
@@ -332,11 +375,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 t.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(COL_TRIP_STATUS)));
                 t.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
                 t.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+                t.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
                 trips.add(t);
             } while (cursor.moveToNext());
         }
         cursor.close();
         return trips;
+    }
+
+
+
+    public void saveFetchedTrips(List<Trip> onlineTrips) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (Trip trip : onlineTrips) {
+            int serverId;
+            try {
+                serverId = Integer.parseInt(trip.getId()); // server id is mapped to 'id' from JSON response
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            
+            Cursor cursor = db.rawQuery("SELECT " + COL_TRIP_ID + " FROM " + TABLE_TRIPS + " WHERE " + COL_SERVER_ID + "=?", new String[]{String.valueOf(serverId)});
+            
+            if (!cursor.moveToFirst()) {
+                cursor.close();
+                cursor = db.rawQuery("SELECT " + COL_TRIP_ID + " FROM " + TABLE_TRIPS + " WHERE (" + COL_SERVER_ID + " IS NULL OR " + COL_SERVER_ID + " = 0) AND " + COL_TRIP_DESTINATION + "=? AND " + COL_TRIP_START_DATE + "=?", new String[]{trip.getDestination(), trip.getStartDate()});
+            }
+            
+            ContentValues values = new ContentValues();
+            values.put(COL_TRIP_USER_ID, trip.getUserId());
+            values.put(COL_TRIP_FROM, trip.getFromLocation());
+            values.put(COL_TRIP_DESTINATION, trip.getDestination());
+            values.put(COL_TRIP_IMAGE, trip.getImageUri());
+            values.put(COL_TRIP_START_DATE, trip.getStartDate());
+            values.put(COL_TRIP_END_DATE, trip.getEndDate());
+            values.put(COL_TRIP_MEMBERS, trip.getMembersCount());
+            values.put(COL_TRIP_BUDGET, trip.getBudget());
+            values.put(COL_TRIP_STATUS, trip.getStatus());
+            values.put(COL_IS_SYNCED, 1);
+            values.put(COL_SYNC_ACTION, "NONE");
+            values.put(COL_SERVER_ID, serverId);
+
+            if (cursor.moveToFirst()) {
+                // Update existing trip
+                String localId = String.valueOf(cursor.getInt(0));
+                db.update(TABLE_TRIPS, values, COL_TRIP_ID + "=?", new String[]{localId});
+            } else {
+                // Insert new trip
+                db.insert(TABLE_TRIPS, null, values);
+            }
+            cursor.close();
+        }
     }
 
     // --- Expense Methods ---
@@ -509,5 +598,127 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return items;
+    }
+    // --- Trip Member Methods ---
+    public long addMemberLocally(com.mrdeveloper.mytourplan.models.TripMember member) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_MEMBER_TRIP_ID, member.getTripId());
+        values.put(COL_MEMBER_NAME, member.getName());
+        values.put(COL_MEMBER_AMOUNT, member.getAmountPaid());
+        values.put(COL_MEMBER_PAYMENT_METHOD, member.getPaymentMethod());
+        values.put(COL_IS_SYNCED, 0);
+        values.put(COL_SYNC_ACTION, "INSERT");
+        return db.insert(TABLE_TRIP_MEMBERS, null, values);
+    }
+
+    public void updateMemberLocally(com.mrdeveloper.mytourplan.models.TripMember member) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_MEMBER_NAME, member.getName());
+        values.put(COL_MEMBER_AMOUNT, member.getAmountPaid());
+        values.put(COL_MEMBER_PAYMENT_METHOD, member.getPaymentMethod());
+        values.put(COL_IS_SYNCED, 0);
+        
+        Cursor cursor = db.rawQuery("SELECT " + COL_SYNC_ACTION + " FROM " + TABLE_TRIP_MEMBERS + " WHERE " + COL_MEMBER_ID + "=?", new String[]{member.getId()});
+        String action = "UPDATE";
+        if (cursor.moveToFirst()) {
+            String currentAction = cursor.getString(0);
+            if ("INSERT".equals(currentAction)) {
+                action = "INSERT";
+            }
+        }
+        cursor.close();
+        
+        values.put(COL_SYNC_ACTION, action);
+        db.update(TABLE_TRIP_MEMBERS, values, COL_MEMBER_ID + "=?", new String[]{member.getId()});
+    }
+
+    public void deleteMemberLocally(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COL_SYNC_ACTION + " FROM " + TABLE_TRIP_MEMBERS + " WHERE " + COL_MEMBER_ID + "=?", new String[]{id});
+        if (cursor.moveToFirst()) {
+            String currentAction = cursor.getString(0);
+            if ("INSERT".equals(currentAction)) {
+                cursor.close();
+                permanentlyDeleteMember(id);
+                return;
+            }
+        }
+        cursor.close();
+        
+        ContentValues values = new ContentValues();
+        values.put(COL_IS_SYNCED, 0);
+        values.put(COL_SYNC_ACTION, "DELETE");
+        db.update(TABLE_TRIP_MEMBERS, values, COL_MEMBER_ID + "=?", new String[]{id});
+    }
+
+    public void permanentlyDeleteMember(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TRIP_MEMBERS, COL_MEMBER_ID + "=?", new String[]{id});
+    }
+
+    public void markMemberAsSynced(String id, int serverId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_IS_SYNCED, 1);
+        values.put(COL_SYNC_ACTION, "NONE");
+        if (serverId != -1) {
+            values.put(COL_SERVER_ID, serverId);
+        }
+        db.update(TABLE_TRIP_MEMBERS, values, COL_MEMBER_ID + "=?", new String[]{id});
+    }
+
+    public List<com.mrdeveloper.mytourplan.models.TripMember> getMembersByTrip(String tripId) {
+        List<com.mrdeveloper.mytourplan.models.TripMember> members = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TRIP_MEMBERS + " WHERE " + COL_MEMBER_TRIP_ID + "=? AND " + COL_SYNC_ACTION + " != 'DELETE' ORDER BY " + COL_MEMBER_ID + " ASC", new String[]{tripId});
+        if (cursor.moveToFirst()) {
+            do {
+                com.mrdeveloper.mytourplan.models.TripMember member = new com.mrdeveloper.mytourplan.models.TripMember();
+                member.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COL_MEMBER_ID))));
+                member.setTripId(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_TRIP_ID)));
+                member.setName(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_NAME)));
+                member.setAmountPaid(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_MEMBER_AMOUNT)));
+                member.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_PAYMENT_METHOD)));
+                member.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
+                member.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+                member.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
+                members.add(member);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return members;
+    }
+
+    public List<com.mrdeveloper.mytourplan.models.TripMember> getUnsyncedMembers() {
+        List<com.mrdeveloper.mytourplan.models.TripMember> members = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TRIP_MEMBERS + " WHERE " + COL_IS_SYNCED + "=0", null);
+        if (cursor.moveToFirst()) {
+            do {
+                com.mrdeveloper.mytourplan.models.TripMember member = new com.mrdeveloper.mytourplan.models.TripMember();
+                member.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COL_MEMBER_ID))));
+                member.setTripId(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_TRIP_ID)));
+                member.setName(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_NAME)));
+                member.setAmountPaid(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_MEMBER_AMOUNT)));
+                member.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow(COL_MEMBER_PAYMENT_METHOD)));
+                member.setIsSynced(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_SYNCED)));
+                member.setSyncAction(cursor.getString(cursor.getColumnIndexOrThrow(COL_SYNC_ACTION)));
+                member.setServerId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
+                members.add(member);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return members;
+    }
+
+    public void deleteTrip(String tripId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_IS_SYNCED, 0);
+        values.put(COL_SYNC_ACTION, "DELETE");
+        db.update(TABLE_TRIPS, values, COL_TRIP_ID + "=?", new String[]{tripId});
+        db.close();
     }
 }

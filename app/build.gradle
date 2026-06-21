@@ -42,6 +42,7 @@ dependencies {
     implementation libs.glide
     implementation libs.okhttp.logging
     implementation libs.biometric
+    implementation libs.swiperefreshlayout
     implementation libs.work.runtime
     testImplementation libs.junit
     androidTestImplementation libs.espresso.core
