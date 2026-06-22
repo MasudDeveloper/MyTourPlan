@@ -4,16 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA">
+    android:fitsSystemWindows="true"
+    android:background="@drawable/bg_screen_gradient">
 
-    <!-- Top AppBar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Custom Premium Gradient App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:title="Edit Profile"
-        app:titleTextColor="#000000" />
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_card_gradient_blue"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Edit Profile"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02" />
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -28,67 +49,69 @@
             
             <!-- Profile Image Section -->
             <FrameLayout
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     app:cardCornerRadius="60dp"
-                    app:cardElevation="0dp">
+                    app:cardElevation="3dp">
                     <ImageView
                         android:id="@+id/ivEditProfilePic"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@android:drawable/ic_menu_camera"
-                        android:background="#E0E0E0" />
+                        android:src="@drawable/ic_profile"
+                        android:background="#E2E8F0" />
                 </androidx.cardview.widget.CardView>
                 
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                <!-- Camera Overlay Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="bottom|end"
-                    android:background="@drawable/bg_circle_camera"
-                    android:padding="6dp"
-                    android:src="@android:drawable/ic_menu_camera"
-                    app:tint="#FFFFFF" />
+                    app:cardCornerRadius="18dp"
+                    app:cardBackgroundColor="@color/primaryColor"
+                    app:strokeWidth="2.5dp"
+                    app:strokeColor="@color/white"
+                    app:cardElevation="5dp">
+                    
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/white" />
+                </com.google.android.material.card.MaterialCardView>
             </FrameLayout>
-            
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Change Profile Photo"
-                android:textColor="#0056D2"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="32dp" />
 
             <!-- Full Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Full Name"
-                android:textColor="#333333"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/ProfileInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:startIconDrawable="@android:drawable/ic_menu_myplaces"
-                app:startIconTint="#999999"
+                app:startIconDrawable="@drawable/ic_user"
+                app:startIconTint="@color/primaryColor"
                 android:layout_marginBottom="20dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etProfileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#333333"
-                    android:inputType="textPersonName" />
+                    android:textColor="@color/textColorPrimary"
+                    android:inputType="textPersonName"
+                    android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email Address -->
@@ -96,23 +119,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email Address"
-                android:textColor="#333333"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/ProfileInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:startIconDrawable="@android:drawable/ic_dialog_email"
-                app:startIconTint="#999999"
+                app:startIconDrawable="@drawable/ic_mail"
+                app:startIconTint="@color/textColorMuted"
                 android:layout_marginBottom="20dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etProfileEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#333333"
+                    android:textColor="@color/textColorMuted"
                     android:enabled="false"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Phone Number -->
@@ -120,8 +145,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Phone Number"
-                android:textColor="#333333"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
             <LinearLayout
                 android:layout_width="match_parent"
@@ -133,8 +159,9 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:text="+880"
-                    android:textColor="#333333"
+                    android:textColor="@color/textColorPrimary"
                     android:textSize="16sp"
+                    android:textStyle="bold"
                     android:gravity="center"
                     android:background="@drawable/bg_country_code"
                     android:layout_marginEnd="12dp" />
@@ -144,14 +171,15 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@android:drawable/ic_menu_call"
-                    app:startIconTint="#999999">
+                    app:startIconDrawable="@drawable/ic_phone"
+                    app:startIconTint="@color/primaryColor">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etProfilePhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:inputType="phone" />
+                        android:textColor="@color/textColorPrimary"
+                        android:inputType="phone"
+                        android:paddingVertical="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -160,15 +188,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Travel Bio"
-                android:textColor="#333333"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/ProfileInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:startIconDrawable="@android:drawable/ic_menu_info_details"
-                app:startIconTint="#999999"
+                app:startIconDrawable="@drawable/ic_info"
+                app:startIconTint="@color/primaryColor"
                 android:layout_marginBottom="32dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTravelBio"
@@ -176,8 +205,9 @@
                     android:layout_height="wrap_content"
                     android:minLines="3"
                     android:gravity="top|start"
-                    android:textColor="#333333"
-                    android:inputType="textMultiLine" />
+                    android:textColor="@color/textColorPrimary"
+                    android:inputType="textMultiLine"
+                    android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Save Changes Button -->
@@ -189,8 +219,11 @@
                 android:text="Save Changes"
                 android:textAllCaps="false"
                 android:textSize="16sp"
-                app:icon="@android:drawable/ic_menu_save"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_save"
                 app:iconGravity="textStart"
+                app:iconTint="@color/white"
+                android:paddingVertical="14dp"
                 android:layout_marginBottom="32dp"/>
 
         </LinearLayout>

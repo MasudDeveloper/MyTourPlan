@@ -66,21 +66,26 @@ public class RegisterActivity extends AppCompatActivity {
         Call<AuthResponse> call = apiService.register(new RegisterRequest(name, email, phone, password));
 
         btnRegister.setEnabled(false);
-        btnRegister.setText("Registering...");
+        btnRegister.setText("Signing Up...");
 
         call.enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Sign Up ➔");
+                btnRegister.setText("Sign Up");
                 
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse authResponse = response.body();
                     if (authResponse.getError() == null || authResponse.getError().isEmpty()) {
                         Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
                         if (authResponse.getUser() != null) {
-                            new com.mrdeveloper.mytourplan.database.DatabaseHelper(RegisterActivity.this).saveOrUpdateUserLocally(authResponse.getUser());
-                            new SharedPrefs(RegisterActivity.this).saveUserSession(authResponse.getToken(), authResponse.getUser().getId(), authResponse.getUser().getName());
+                            new SharedPrefs(RegisterActivity.this).saveUserSession(
+                                    authResponse.getToken(),
+                                    authResponse.getUser().getId(),
+                                    authResponse.getUser().getName(),
+                                    authResponse.getUser().getEmail(),
+                                    authResponse.getUser().getPhone()
+                            );
                             startActivity(new Intent(RegisterActivity.this, com.mrdeveloper.mytourplan.MainActivity.class));
                             finishAffinity();
                         } else {
@@ -97,7 +102,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Sign Up ➔");
+                btnRegister.setText("Sign Up");
                 Toast.makeText(RegisterActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

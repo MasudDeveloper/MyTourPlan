@@ -61,12 +61,6 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister = findViewById(R.id.tvRegister);
         ivLoginHero = findViewById(R.id.ivLoginHero);
 
-        // Load dynamic hero image from Unsplash
-        Glide.with(this)
-             .load("https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80")
-             .placeholder(R.color.secondaryColor)
-             .into(ivLoginHero);
-
         btnLogin.setOnClickListener(v -> loginUser());
         tvRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
@@ -101,8 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                     AuthResponse authResponse = response.body();
                     if (authResponse.getError() == null || authResponse.getError().isEmpty()) {
                         if (authResponse.getUser() != null) {
-                            new com.mrdeveloper.mytourplan.database.DatabaseHelper(LoginActivity.this).saveOrUpdateUserLocally(authResponse.getUser());
-                            sharedPrefs.saveUserSession(authResponse.getToken(), authResponse.getUser().getId(), authResponse.getUser().getName());
+                            sharedPrefs.saveUserSession(authResponse.getToken(), authResponse.getUser().getId(),
+                                    authResponse.getUser().getName(), authResponse.getUser().getEmail(), authResponse.getUser().getPhone());
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finishAffinity();
                         } else {
@@ -112,7 +106,8 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, authResponse.getError(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Login failed. Incorrect credentials.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Login failed. Incorrect credentials.", Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
 

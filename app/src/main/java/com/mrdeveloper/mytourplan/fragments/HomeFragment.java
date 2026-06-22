@@ -133,9 +133,18 @@ public class HomeFragment extends Fragment {
                     
                     if (data.getError() == null || data.getError().isEmpty()) {
                         if (tvWelcome != null) tvWelcome.setText("Welcome back, " + data.getUserName());
-                        // Assume profile pic logic can be added to backend later, for now placeholder
-                        if (ivProfileTop != null) {
-                            Glide.with(HomeFragment.this).load("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80").into(ivProfileTop);
+                        
+                        // Load user profile picture dynamically
+                        String profilePicUrl = sharedPrefs.getProfilePic();
+                        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+                            if (ivProfileTop != null) {
+                                Glide.with(HomeFragment.this)
+                                     .load(Uri.parse(profilePicUrl))
+                                     .placeholder(R.drawable.ic_profile)
+                                     .into(ivProfileTop);
+                            }
+                        } else {
+                            fetchProfilePicFromServer();
                         }
 
                         Trip upcoming = data.getUpcomingTrip();
@@ -150,7 +159,7 @@ public class HomeFragment extends Fragment {
                             if (upcoming.getImageUri() != null && !upcoming.getImageUri().isEmpty() && ivUpcomingTrip != null) {
                                 Glide.with(HomeFragment.this).load(Uri.parse(upcoming.getImageUri())).into(ivUpcomingTrip);
                             } else if (ivUpcomingTrip != null) {
-                                Glide.with(HomeFragment.this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
+                                Glide.with(HomeFragment.this).load(R.drawable.ic_login_hero).into(ivUpcomingTrip);
                             }
 
                             if (ivUpcomingTrip != null) {
@@ -185,8 +194,50 @@ public class HomeFragment extends Fragment {
         if (tvUpcomingDest != null) tvUpcomingDest.setText("No upcoming trips");
         if (tvUpcomingDates != null) tvUpcomingDates.setText("Plan your next adventure!");
         if (ivUpcomingTrip != null) {
-            Glide.with(this).load("https://images.unsplash.com/photo-1540206351-d7ce9f1ea280?auto=format&fit=crop&w=800&q=80").into(ivUpcomingTrip);
+            Glide.with(this).load(R.drawable.ic_login_hero).into(ivUpcomingTrip);
             ivUpcomingTrip.setOnClickListener(null);
+        }
+    }
+
+    private void fetchProfilePicFromServer() {
+        if (getContext() == null) return;
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sharedPrefs.getToken();
+        apiService.getProfile("Bearer " + token).enqueue(new Callback<com.mrdeveloper.mytourplan.models.ProfileResponse>() {
+            @Override
+            public void onResponse(Call<com.mrdeveloper.mytourplan.models.ProfileResponse> call, Response<com.mrdeveloper.mytourplan.models.ProfileResponse> response) {
+                if (!isAdded() || getContext() == null) return;
+                if (response.isSuccessful() && response.body() != null) {
+                    com.mrdeveloper.mytourplan.models.ProfileResponse profile = response.body();
+                    if (profile.getProfilePic() != null && !profile.getProfilePic().isEmpty()) {
+                        sharedPrefs.saveProfilePic(profile.getProfilePic());
+                        if (ivProfileTop != null) {
+                            Glide.with(HomeFragment.this)
+                                 .load(Uri.parse(profile.getProfilePic()))
+                                 .placeholder(R.drawable.ic_profile)
+                                 .into(ivProfileTop);
+                        }
+                    } else {
+                        loadDefaultProfilePic();
+                    }
+                } else {
+                    loadDefaultProfilePic();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.mrdeveloper.mytourplan.models.ProfileResponse> call, Throwable t) {
+                if (!isAdded() || getContext() == null) return;
+                loadDefaultProfilePic();
+            }
+        });
+    }
+
+    private void loadDefaultProfilePic() {
+        if (ivProfileTop != null) {
+            Glide.with(HomeFragment.this)
+                 .load(R.drawable.ic_profile)
+                 .into(ivProfileTop);
         }
     }
 }

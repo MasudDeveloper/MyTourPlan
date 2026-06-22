@@ -19,12 +19,11 @@ import com.mrdeveloper.mytourplan.R;
 import com.mrdeveloper.mytourplan.adapters.TripAdapter;
 import com.mrdeveloper.mytourplan.api.ApiClient;
 import com.mrdeveloper.mytourplan.api.ApiService;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
+
 import com.mrdeveloper.mytourplan.models.Trip;
 import com.mrdeveloper.mytourplan.models.TripsResponse;
 import com.mrdeveloper.mytourplan.utils.NetworkUtils;
 import com.mrdeveloper.mytourplan.utils.SharedPrefs;
-import com.mrdeveloper.mytourplan.workers.SyncWorker;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class MyTripsFragment extends Fragment {
     private View layoutEmptyState;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TripAdapter adapter;
-    private DatabaseHelper db;
+
     private TripAdapter.OnTripActionListener tripListener;
 
     @Nullable
@@ -53,7 +52,7 @@ public class MyTripsFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
 
         rvTrips.setLayoutManager(new LinearLayoutManager(getContext()));
-        db = new DatabaseHelper(getContext());
+
         
         swipeRefreshLayout.setOnRefreshListener(this::loadTrips);
 
@@ -69,6 +68,13 @@ public class MyTripsFragment extends Fragment {
             public void onEditClick(Trip trip) {
                 android.content.Intent intent = new android.content.Intent(getContext(), com.mrdeveloper.mytourplan.activities.AddTripActivity.class);
                 intent.putExtra("edit_trip_id", trip.getId());
+                intent.putExtra("from_location", trip.getFromLocation());
+                intent.putExtra("destination", trip.getDestination());
+                intent.putExtra("start_date", trip.getStartDate());
+                intent.putExtra("end_date", trip.getEndDate());
+                intent.putExtra("members_count", trip.getMembersCount());
+                intent.putExtra("budget", trip.getBudget());
+                intent.putExtra("image_uri", trip.getImageUri());
                 startActivity(intent);
             }
 

@@ -5,12 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#F8FAFC">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:background="@android:color/transparent"
         android:theme="@style/ThemeOverlay.Material3.Dark">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -19,10 +21,10 @@
             android:layout_height="match_parent"
             app:contentScrim="@color/primaryColor"
             app:expandedTitleGravity="bottom"
-            app:expandedTitleMarginBottom="20dp"
+            app:expandedTitleMarginBottom="48dp"
             app:expandedTitleMarginStart="24dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="নতুন ট্যুর যোগ করুন"
+            app:title="ভ্রমণ পরিকল্পনা যোগ করুন"
             app:expandedTitleTextColor="@android:color/white"
             app:collapsedTitleTextColor="@android:color/white"
             app:expandedTitleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
@@ -37,29 +39,33 @@
                     android:id="@+id/ivTripCover"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E2E8F0"
+                    android:background="#F1F5F9"
                     android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_camera" />
+                    android:src="@drawable/ic_login_hero" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/gradient_overlay" />
+                    android:background="@drawable/bg_gradient_overlay" />
 
+                <!-- Edit Cover Photo Floating Action Card -->
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="bottom|end"
-                    android:layout_margin="16dp"
-                    app:cardBackgroundColor="#CC000000"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="44dp"
+                    app:cardBackgroundColor="@color/primaryColor"
                     app:cardCornerRadius="20dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/white"
+                    app:cardElevation="4dp">
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:layout_margin="8dp"
-                        android:src="@android:drawable/ic_menu_camera"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_camera"
                         app:tint="@android:color/white" />
                 </com.google.android.material.card.MaterialCardView>
             </FrameLayout>
@@ -69,6 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_back"
                 app:navigationIconTint="@android:color/white"
                 app:titleTextColor="@android:color/white" />
 
@@ -86,7 +93,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="36dp"
+            android:paddingBottom="24dp">
 
             <!-- Location Section -->
             <TextView
@@ -94,38 +104,45 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:text="ভ্রমণের স্থান"
-                android:textColor="#64748B"
+                android:textColor="@color/primaryColor"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/InputStyle"
+                style="@style/ProfileInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="কোথা থেকে যাবেন? (From)"
-                app:startIconDrawable="@android:drawable/ic_menu_mylocation">
+                app:startIconDrawable="@drawable/ic_location"
+                app:startIconTint="@color/primaryColor">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFrom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:textColor="@color/textColorPrimary"
+                    android:hint="কোথা থেকে যাবেন? (From)"
+                    android:inputType="text"
+                    android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/InputStyle"
+                style="@style/ProfileInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:hint="কোথায় যাবেন? (গন্তব্য)"
-                app:startIconDrawable="@android:drawable/ic_menu_mapmode">
+                app:startIconDrawable="@drawable/ic_location"
+                app:startIconTint="@color/primaryColor">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDestination"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:textColor="@color/textColorPrimary"
+                    android:hint="কোথায় যাবেন? (গন্তব্য)"
+                    android:inputType="text"
+                    android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Details Section -->
@@ -134,9 +151,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:text="বাজেট ও মেম্বার"
-                android:textColor="#64748B"
+                android:textColor="@color/primaryColor"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -146,35 +164,41 @@
                 android:weightSum="2">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/InputStyle"
+                    style="@style/ProfileInputStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="মেম্বার"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces">
+                    app:startIconDrawable="@drawable/ic_user"
+                    app:startIconTint="@color/primaryColor">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etMembers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number" />
+                        android:textColor="@color/textColorPrimary"
+                        android:hint="মেম্বার"
+                        android:inputType="number"
+                        android:paddingVertical="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/InputStyle"
+                    style="@style/ProfileInputStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:hint="বাজেট (টাকা)"
-                    app:startIconDrawable="@android:drawable/ic_menu_edit">
+                    app:startIconDrawable="@drawable/ic_edit"
+                    app:startIconTint="@color/primaryColor">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etBudget"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal" />
+                        android:textColor="@color/textColorPrimary"
+                        android:hint="বাজেট (টাকা)"
+                        android:inputType="numberDecimal"
+                        android:paddingVertical="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -184,9 +208,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:text="ভ্রমণের তারিখ"
-                android:textColor="#64748B"
+                android:textColor="@color/primaryColor"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -196,37 +221,43 @@
                 android:weightSum="2">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/InputStyle"
+                    style="@style/ProfileInputStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="যাওয়ার তারিখ"
-                    app:startIconDrawable="@android:drawable/ic_menu_today">
+                    app:startIconDrawable="@drawable/ic_calendar"
+                    app:startIconTint="@color/primaryColor">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etStartDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/textColorPrimary"
+                        android:hint="যাওয়ার তারিখ"
                         android:clickable="true"
-                        android:focusable="false" />
+                        android:focusable="false"
+                        android:paddingVertical="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/InputStyle"
+                    style="@style/ProfileInputStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:hint="ফেরার তারিখ"
-                    app:startIconDrawable="@android:drawable/ic_menu_today">
+                    app:startIconDrawable="@drawable/ic_calendar"
+                    app:startIconTint="@color/primaryColor">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etEndDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/textColorPrimary"
+                        android:hint="ফেরার তারিখ"
                         android:clickable="true"
-                        android:focusable="false" />
+                        android:focusable="false"
+                        android:paddingVertical="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -237,8 +268,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:text="ট্যুর তৈরি করুন"
-                app:icon="@android:drawable/ic_menu_save"
-                app:iconGravity="textStart" />
+                android:textStyle="bold"
+                app:icon="@drawable/ic_save"
+                app:iconGravity="textStart"
+                app:iconTint="@color/white"
+                android:paddingVertical="14dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

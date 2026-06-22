@@ -40,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $image_uri = "http://" . $_SERVER['HTTP_HOST'] . "/" . dirname($_SERVER['PHP_SELF']) . "/" . $target_file;
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+            $image_uri = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/" . $target_file;
             $image_query = ", image_uri = ?";
             $params[] = $image_uri;
         }

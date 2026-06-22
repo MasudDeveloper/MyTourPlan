@@ -5,9 +5,21 @@ require_once 'config.php';
 require_once 'jwt_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $user_id = $_POST['user_id'] ?? '';
+    $token = getBearerToken();
+    if (!$token) {
+        echo json_encode(["error" => "Unauthorized"]);
+        exit();
+    }
+
+    $user = validateJWT($token, $jwt_secret);
+    if (!$user) {
+        echo json_encode(["error" => "Invalid Token"]);
+        exit();
+    }
+
     $name = $_POST['name'] ?? '';
     $phone = $_POST['phone'] ?? '';
+    $user_id = $user->user_id;
 
     // Handle Profile Image Upload
     $profile_pic = "";
@@ -20,12 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_file)) {
-            $profile_pic = "http://" . $_SERVER['HTTP_HOST'] . "/" . dirname($_SERVER['PHP_SELF']) . "/" . $target_file;
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+            $profile_pic = $protocol . "://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/" . $target_file;
         }
     }
 
-    if (empty($user_id)) {
-        echo json_encode(["error" => "User ID is required"]);
+    if (empty($name)) {
+        echo json_encode(["error" => "Name is required"]);
         exit;
     }
 
@@ -45,3 +58,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     echo json_encode(["error" => "Invalid Request Method"]);
 }
+?>

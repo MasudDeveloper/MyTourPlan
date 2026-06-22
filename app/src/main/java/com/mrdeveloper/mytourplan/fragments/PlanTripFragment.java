@@ -23,6 +23,14 @@ public class PlanTripFragment extends Fragment {
         view.findViewById(R.id.btnGeneratePlan).setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), AddTripActivity.class));
         });
+
+        view.findViewById(R.id.cvExploreTemplates).setOnClickListener(v -> {
+            android.widget.Toast.makeText(getContext(), "Explore Templates feature coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        view.findViewById(R.id.cvJoinTour).setOnClickListener(v -> {
+            android.widget.Toast.makeText(getContext(), "Join Tour feature coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+        });
         
         return view;
     }

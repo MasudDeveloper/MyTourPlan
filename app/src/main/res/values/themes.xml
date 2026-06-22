@@ -10,6 +10,12 @@
 
     <style name="Theme.MyTourPlan" parent="Base.Theme.MyTourPlan" />
 
+    <style name="Theme.MyTourPlan.Splash" parent="Theme.MyTourPlan">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+    </style>
+
     <style name="InputStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>

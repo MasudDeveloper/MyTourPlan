@@ -57,10 +57,10 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             Glide.with(holder.itemView.getContext())
                     .load(imageUri)
                     .centerCrop()
-                    .placeholder(R.drawable.ic_no_image)
+                    .placeholder(R.drawable.ic_login_hero)
                     .into(holder.ivTripCover);
         } else {
-            holder.ivTripCover.setImageResource(R.drawable.ic_no_image);
+            holder.ivTripCover.setImageResource(R.drawable.ic_login_hero);
         }
 
         holder.btnEdit.setOnClickListener(v -> {

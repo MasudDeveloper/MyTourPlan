@@ -2,11 +2,16 @@ package com.mrdeveloper.mytourplan.activities;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.mrdeveloper.mytourplan.R;
 import com.mrdeveloper.mytourplan.api.ApiClient;
@@ -24,6 +29,8 @@ import java.util.Locale;
 
 public class AddItineraryActivity extends AppCompatActivity {
 
+    private static final String TAG = "AddItineraryActivity";
+
     private EditText etDay, etTime, etActivity, etLocation;
     private Button btnSaveItinerary;
     private String tripId;
@@ -33,6 +40,16 @@ public class AddItineraryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_itinerary);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // Setup Toolbar with back navigation
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         sharedPrefs = new SharedPrefs(this);
         tripId = getIntent().getStringExtra("trip_id");
@@ -48,8 +65,6 @@ public class AddItineraryActivity extends AppCompatActivity {
         etLocation = findViewById(R.id.etLocation);
         btnSaveItinerary = findViewById(R.id.btnSaveItinerary);
 
-        etTime.setFocusable(false);
-        etTime.setClickable(true);
         etTime.setOnClickListener(v -> showTimePicker());
 
         btnSaveItinerary.setOnClickListener(v -> saveItinerary());
@@ -87,7 +102,13 @@ public class AddItineraryActivity extends AppCompatActivity {
             return;
         }
 
-        int day = Integer.parseInt(dayStr);
+        int day;
+        try {
+            day = Integer.parseInt(dayStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Please enter a valid day number", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
             Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
@@ -100,24 +121,45 @@ public class AddItineraryActivity extends AppCompatActivity {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String token = sharedPrefs.getToken();
 
+        Log.d(TAG, "Syncing itinerary: trip_id=" + tripId + ", day=" + day + ", time=" + time + ", activity=" + activity + ", location=" + location);
+
         apiService.syncItinerary("Bearer " + token, tripId, day, time, activity, location, "").enqueue(new Callback<SyncGenericResponse>() {
             @Override
             public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(AddItineraryActivity.this, "Activity Added", Toast.LENGTH_SHORT).show();
-                    finish();
+                if (response.isSuccessful() && response.body() != null) {
+                    SyncGenericResponse body = response.body();
+                    if (body.isSuccess()) {
+                        Toast.makeText(AddItineraryActivity.this, "Activity Added", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        btnSaveItinerary.setEnabled(true);
+                        btnSaveItinerary.setText("যোগ করুন");
+                        String errorMsg = body.getError() != null ? body.getError() : "Unknown server error";
+                        Log.e(TAG, "Server returned error: " + errorMsg);
+                        Toast.makeText(AddItineraryActivity.this, "Failed: " + errorMsg, Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     btnSaveItinerary.setEnabled(true);
-                    btnSaveItinerary.setText("Save Itinerary");
-                    Toast.makeText(AddItineraryActivity.this, "Failed to add activity", Toast.LENGTH_SHORT).show();
+                    btnSaveItinerary.setText("যোগ করুন");
+                    String errorDetail = "HTTP " + response.code();
+                    try {
+                        if (response.errorBody() != null) {
+                            errorDetail += ": " + response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error reading error body", e);
+                    }
+                    Log.e(TAG, "Sync failed: " + errorDetail);
+                    Toast.makeText(AddItineraryActivity.this, "Failed: " + errorDetail, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 btnSaveItinerary.setEnabled(true);
-                btnSaveItinerary.setText("Save Itinerary");
-                Toast.makeText(AddItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnSaveItinerary.setText("যোগ করুন");
+                Log.e(TAG, "Network error syncing itinerary", t);
+                Toast.makeText(AddItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

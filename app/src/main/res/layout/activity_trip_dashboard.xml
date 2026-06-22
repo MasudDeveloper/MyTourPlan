@@ -5,13 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#F8FAFC">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:fitsSystemWindows="true"
+        android:layout_height="245dp"
         android:background="@android:color/transparent"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -19,48 +19,52 @@
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="#0099DD"
+            app:contentScrim="@color/primaryColor"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:titleEnabled="true"
+            app:expandedTitleTextColor="@android:color/white"
+            app:collapsedTitleTextColor="@android:color/white"
             app:expandedTitleMarginStart="24dp"
-            app:expandedTitleMarginBottom="36dp">
+            app:expandedTitleMarginBottom="72dp">
 
             <ImageView
                 android:id="@+id/ivDashboardCover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                app:layout_collapseMode="parallax" />
+                app:layout_collapseMode="parallax"
+                android:src="@drawable/ic_login_hero" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_gradient_overlay" />
 
+            <!-- Subtitle Section (Dates) -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="24dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="36dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_collapseMode="parallax">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@android:drawable/ic_menu_today"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_calendar"
                     app:tint="#E2E8F0" />
 
                 <TextView
                     android:id="@+id/tvTripDates"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="8dp"
                     android:text="Dates"
                     android:textColor="#E2E8F0"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <androidx.appcompat.widget.Toolbar
@@ -75,6 +79,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/bg_bottom_sheet_rounded"
+        android:layout_marginTop="-24dp"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -84,15 +90,16 @@
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
             android:paddingBottom="100dp"
-            android:paddingTop="24dp"
+            android:paddingTop="48dp"
             android:clipChildren="false"
             android:clipToPadding="false">
 
+            <!-- Budget Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardElevation="8dp"
+                app:cardElevation="4dp"
                 app:cardCornerRadius="24dp"
                 app:strokeWidth="0dp">
 
@@ -120,14 +127,15 @@
                                 android:text="TOTAL BUDGET"
                                 android:textColor="#B3FFFFFF"
                                 android:textSize="12sp"
-                                android:letterSpacing="0.05" />
+                                android:letterSpacing="0.05"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/tvTotalBudget"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="$0.00"
+                                android:text="৳0.00"
                                 android:textColor="@android:color/white"
                                 android:textSize="26sp"
                                 android:textStyle="bold" />
@@ -146,7 +154,8 @@
                                 android:text="MEMBERS"
                                 android:textColor="#B3FFFFFF"
                                 android:textSize="12sp"
-                                android:letterSpacing="0.05" />
+                                android:letterSpacing="0.05"
+                                android:textStyle="bold" />
 
                             <FrameLayout
                                 android:layout_width="wrap_content"
@@ -188,7 +197,7 @@
                             android:id="@+id/tvBudgetPercentage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0% ($0)"
+                            android:text="0% (৳0)"
                             android:textColor="@android:color/white"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -205,6 +214,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Navigation Actions Grid -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -212,6 +222,7 @@
                 android:orientation="horizontal"
                 android:baselineAligned="false">
 
+                <!-- Members Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnGroupMembers"
                     android:layout_width="0dp"
@@ -244,7 +255,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_myplaces"
+                                android:src="@drawable/ic_user"
                                 app:tint="#0F172A" />
                         </FrameLayout>
 
@@ -253,10 +264,12 @@
                             android:layout_height="wrap_content"
                             android:text="Members"
                             android:textColor="#334155"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Itinerary Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnViewItinerary"
                     android:layout_width="0dp"
@@ -289,7 +302,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_today"
+                                android:src="@drawable/ic_calendar"
                                 app:tint="#0F172A" />
                         </FrameLayout>
 
@@ -298,10 +311,12 @@
                             android:layout_height="wrap_content"
                             android:text="Itinerary"
                             android:textColor="#334155"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Calculate Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnCalculate"
                     android:layout_width="0dp"
@@ -334,7 +349,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_sort_by_size"
+                                android:src="@drawable/ic_edit"
                                 app:tint="#0F172A" />
                         </FrameLayout>
 
@@ -343,11 +358,13 @@
                             android:layout_height="wrap_content"
                             android:text="Calculate"
                             android:textColor="#334155"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <!-- Recent Expenses Title -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -369,7 +386,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View All"
-                    android:textColor="#0099DD"
+                    android:textColor="@color/primaryColor"
+                    android:textStyle="bold"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -400,9 +418,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        app:backgroundTint="#00A3FF"
+        app:backgroundTint="@color/primaryColor"
         app:tint="@android:color/white"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_add"
         app:elevation="8dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -18,9 +18,13 @@ public class SyncGenericResponse {
     @SerializedName("error")
     private String error;
 
+    @SerializedName("profile_pic")
+    private String profilePic;
+
     public boolean isSuccess() { return success; }
     public int getServerId() { return serverId; }
     public String getLocalId() { return localId; }
     public String getMessage() { return message; }
     public String getError() { return error; }
+    public String getProfilePic() { return profilePic; }
 }

@@ -4,7 +4,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
+    android:background="@drawable/bg_screen_gradient"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,14 +14,12 @@
         android:padding="24dp"
         android:gravity="center_horizontal">
 
+        <!-- Custom App Logo -->
         <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_explore"
-            android:background="@drawable/bg_icon_primary"
-            android:padding="12dp"
-            app:tint="@color/surfaceColor"
-            android:layout_marginTop="24dp"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:src="@drawable/ic_logo"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
 
         <TextView
@@ -30,51 +29,63 @@
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/textColorPrimary"
-            android:layout_marginBottom="8dp"/>
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="6dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Login to continue your adventure"
+            android:text="Sign in to continue your adventure"
             android:textSize="14sp"
             android:textColor="@color/textColorMuted"
+            android:fontFamily="sans-serif"
             android:layout_marginBottom="24dp"/>
 
+        <!-- Custom Vector Travel Illustration Header -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:cardCornerRadius="12dp"
+            android:layout_height="150dp"
+            app:cardCornerRadius="16dp"
             android:layout_marginBottom="24dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:theme="@style/CardStyle">
             
             <ImageView
                 android:id="@+id/ivLoginHero"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:background="#455A64"/> <!-- Placeholder color -->
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_login_hero"
+                android:padding="8dp"/>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Main Form Card -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/CardStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
             app:strokeWidth="1dp"
-            app:strokeColor="#E0E0E0"
+            app:strokeColor="#F1F5F9"
+            app:cardBackgroundColor="@color/surfaceColor"
             android:layout_marginBottom="24dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="24dp">
 
+                <!-- Email field -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Email or Username"
                     android:textColor="@color/textColorPrimary"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     android:layout_marginBottom="8dp"/>
 
                 <EditText
@@ -83,32 +94,41 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_input"
                     android:hint="example@travel.com"
-                    android:padding="12dp"
+                    android:inputType="textEmailAddress"
+                    android:padding="14dp"
                     android:textSize="14sp"
-                    android:drawableStart="@android:drawable/ic_dialog_email"
+                    android:textColor="@color/textColorPrimary"
+                    android:textColorHint="#94A3B8"
+                    android:drawableStart="@drawable/ic_mail"
                     android:drawablePadding="12dp"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="20dp"/>
 
+                <!-- Password field -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="8dp">
+                    
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Password"
                         android:textColor="@color/textColorPrimary"
-                        android:textSize="12sp"/>
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
+                        
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Forgot Password?"
                         android:textColor="@color/primaryColor"
                         android:textSize="12sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
                 </LinearLayout>
 
                 <EditText
@@ -118,33 +138,43 @@
                     android:background="@drawable/bg_input"
                     android:hint="••••••••"
                     android:inputType="textPassword"
-                    android:padding="12dp"
+                    android:padding="14dp"
                     android:textSize="14sp"
-                    android:drawableStart="@android:drawable/ic_lock_lock"
+                    android:textColor="@color/textColorPrimary"
+                    android:textColorHint="#94A3B8"
+                    android:drawableStart="@drawable/ic_lock"
                     android:drawablePadding="12dp"
                     android:layout_marginBottom="24dp"/>
 
+                <!-- Gradient Login Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Login ➔"
-                    app:cornerRadius="8dp"
-                    android:backgroundTint="@color/secondaryColor"
-                    android:paddingVertical="12dp"
+                    android:text="Sign In"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:background="@drawable/bg_button_gradient"
+                    app:backgroundTint="@null"
+                    app:cornerRadius="12dp"
+                    android:paddingVertical="14dp"
                     android:layout_marginBottom="24dp"/>
 
+                <!-- Divider -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="24dp">
-                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E0E0E0"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OR CONTINUE WITH" android:textSize="10sp" android:textColor="@color/textColorMuted" android:layout_marginHorizontal="16dp"/>
-                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E0E0E0"/>
+                    android:layout_marginBottom="20dp">
+                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OR CONTINUE WITH" android:textSize="10sp" android:textColor="@color/textColorMuted" android:letterSpacing="0.05" android:layout_marginHorizontal="16dp"/>
+                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
                 </LinearLayout>
 
+                <!-- Social Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -156,7 +186,8 @@
                         android:text="Google"
                         style="@style/Widget.Material3.Button.OutlinedButton"
                         android:textColor="@color/textColorPrimary"
-                        app:cornerRadius="8dp"
+                        app:cornerRadius="12dp"
+                        android:paddingVertical="10dp"
                         android:layout_marginEnd="8dp"/>
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="0dp"
@@ -165,13 +196,15 @@
                         android:text="Facebook"
                         style="@style/Widget.Material3.Button.OutlinedButton"
                         android:textColor="@color/textColorPrimary"
-                        app:cornerRadius="8dp"
+                        app:cornerRadius="12dp"
+                        android:paddingVertical="10dp"
                         android:layout_marginStart="8dp"/>
                 </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Bottom Signup prompt -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -190,17 +223,19 @@
                 android:text="Sign Up"
                 android:textColor="@color/primaryColor"
                 android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"/>
         </LinearLayout>
         
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="16dp"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F5F9" android:layout_marginBottom="16dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Premium planning starting at only 500 BDT/month."
             android:textColor="@color/textColorMuted"
-            android:textSize="10sp"/>
+            android:textSize="10sp"
+            android:letterSpacing="0.02"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

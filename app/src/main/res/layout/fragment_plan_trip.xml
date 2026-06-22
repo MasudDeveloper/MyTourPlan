@@ -94,8 +94,7 @@
                             android:layout_width="28dp"
                             android:layout_height="28dp"
                             android:layout_gravity="center"
-                            android:src="@android:drawable/ic_menu_edit"
-                            app:tint="#0099DD" />
+                            android:src="@drawable/ic_edit" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -125,9 +124,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_play"
-                        app:tint="#CBD5E1"
-                        android:rotation="180" />
+                        android:src="@drawable/ic_chevron_right" />
                     <!-- Right arrow visually (flipped play icon or similar, or just leave it) -->
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -142,6 +139,7 @@
 
                 <!-- Explore Templates -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvExploreTemplates"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -172,8 +170,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_mapmode"
-                                app:tint="#22C55E" />
+                                android:src="@drawable/ic_map" />
                         </FrameLayout>
 
                         <TextView
@@ -189,6 +186,7 @@
 
                 <!-- Join Tour -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvJoinTour"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -219,8 +217,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_add"
-                                app:tint="#F97316" />
+                                android:src="@drawable/ic_add" />
                         </FrameLayout>
 
                         <TextView
@@ -265,8 +262,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_recent_history"
-                        app:tint="#CBD5E1"
+                        android:src="@drawable/ic_history"
                         android:layout_marginBottom="16dp" />
 
                     <TextView

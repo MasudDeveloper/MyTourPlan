@@ -145,4 +145,15 @@ public interface ApiService {
     @GET("get_members.php")
     Call<com.mrdeveloper.mytourplan.models.MembersResponse> getMembers(@Header("Authorization") String token, @Query("trip_id") String tripId);
 
+    @GET("get_profile.php")
+    Call<com.mrdeveloper.mytourplan.models.ProfileResponse> getProfile(@Header("Authorization") String token);
+
+    @Multipart
+    @POST("update_profile.php")
+    Call<SyncGenericResponse> updateProfile(
+            @Header("Authorization") String token,
+            @Part("name") RequestBody name,
+            @Part("phone") RequestBody phone,
+            @Part okhttp3.MultipartBody.Part profilePic
+    );
 }

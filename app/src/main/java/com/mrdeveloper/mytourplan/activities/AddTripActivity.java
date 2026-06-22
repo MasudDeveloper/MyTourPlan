@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
 
 import com.mrdeveloper.mytourplan.R;
-import com.mrdeveloper.mytourplan.database.DatabaseHelper;
 import com.mrdeveloper.mytourplan.models.Trip;
 import com.mrdeveloper.mytourplan.api.ApiClient;
 import com.mrdeveloper.mytourplan.api.ApiService;
@@ -28,6 +27,8 @@ import com.mrdeveloper.mytourplan.utils.NetworkUtils;
 import com.mrdeveloper.mytourplan.utils.SharedPrefs;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Calendar;
 
 import okhttp3.MediaType;
@@ -185,12 +186,20 @@ public class AddTripActivity extends AppCompatActivity {
         RequestBody statusBody = RequestBody.create(MediaType.parse("text/plain"), "Upcoming");
         
         MultipartBody.Part imagePart = null;
-        if (selectedImageUri != null && selectedImageUri.getScheme() != null) {
-            // Very basic file handling for content URI (ideally should copy to cache)
-            // Note: Since this is an architectural overhaul, we rely on the backend to handle or ignore invalid files if path isn't real.
+        if (selectedImageUri != null) {
             try {
-                if ("file".equals(selectedImageUri.getScheme())) {
-                    File file = new File(selectedImageUri.getPath());
+                InputStream is = getContentResolver().openInputStream(selectedImageUri);
+                if (is != null) {
+                    File file = new File(getCacheDir(), "trip_temp.jpg");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = is.read(buffer)) > 0) {
+                        fos.write(buffer, 0, len);
+                    }
+                    fos.close();
+                    is.close();
+
                     RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
                     imagePart = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
                 }

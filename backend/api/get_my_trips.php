@@ -26,7 +26,9 @@ foreach ($trips as $trip) {
     $response["trips"][] = [
         "id" => (string)$trip['id'],
         "user_id" => (string)$trip['user_id'],
+        "from_location" => $trip['from_location'] ?? "",
         "destination" => $trip['destination'],
+        "image_uri" => $trip['image_uri'] ?? "",
         "start_date" => $trip['start_date'],
         "end_date" => $trip['end_date'],
         "members_count" => (int)$trip['members_count'],
