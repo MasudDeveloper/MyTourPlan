@@ -52,9 +52,10 @@ foreach ($membersData as $member) {
     $totalDue = $budgetPerPerson - $amountPaid;
     $status = "Due";
     
-    if ($totalDue <= 0) {
+    if ($totalDue < 0) {
+        $status = "Refund";
+    } else if ($totalDue == 0) {
         $status = "Paid";
-        $totalDue = 0;
     }
 
     $name = $member['name'];

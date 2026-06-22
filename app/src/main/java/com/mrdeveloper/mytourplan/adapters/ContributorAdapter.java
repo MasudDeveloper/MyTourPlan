@@ -46,23 +46,33 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
         
         holder.tvAmount.setText(String.format(java.util.Locale.US, "৳ %.2f / ৳ %.2f", amountPaid, totalCost));
         
-        int percentage = totalCost > 0 ? (int) ((amountPaid / totalCost) * 100) : 0;
-        if (percentage > 100) percentage = 100; // In case they overpaid
+        int actualPercentage = totalCost > 0 ? (int) ((amountPaid / totalCost) * 100) : 0;
         
-        holder.tvPercentage.setText(percentage + "%");
-        holder.progressBar.setProgress(percentage);
+        holder.tvPercentage.setText(actualPercentage + "%");
+        holder.progressBar.setProgress(Math.min(actualPercentage, 100));
 
-        // For simplicity, just use status
+        // Format status text and colors
         if ("Paid".equalsIgnoreCase(contributor.getStatus())) {
             holder.tvStatus.setText("Fully Paid");
             holder.tvStatus.setTextColor(0xFF4CAF50); // Green
             holder.tvPercentage.setTextColor(0xFF4CAF50);
             holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
+            holder.tvPersonalDueRefund.setText("পরিশোধিত (কোনো দেনা-পাওনা নেই)");
+            holder.tvPersonalDueRefund.setTextColor(0xFF4CAF50);
+        } else if ("Refund".equalsIgnoreCase(contributor.getStatus())) {
+            holder.tvStatus.setText(String.format(java.util.Locale.US, "Refund: ৳ %.2f", Math.abs(totalDue)));
+            holder.tvStatus.setTextColor(0xFF4CAF50); // Green
+            holder.tvPercentage.setTextColor(0xFF4CAF50);
+            holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
+            holder.tvPersonalDueRefund.setText(String.format(java.util.Locale.US, "ফেরত পাবেন: ৳ %,.2f", Math.abs(totalDue)));
+            holder.tvPersonalDueRefund.setTextColor(0xFF4CAF50);
         } else {
             holder.tvStatus.setText(String.format(java.util.Locale.US, "Due: ৳ %.2f", totalDue));
             holder.tvStatus.setTextColor(0xFFE65100); // Orange
             holder.tvPercentage.setTextColor(0xFFE65100);
             holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFFE65100));
+            holder.tvPersonalDueRefund.setText(String.format(java.util.Locale.US, "পরিশোধ করতে হবে: ৳ %,.2f", totalDue));
+            holder.tvPersonalDueRefund.setTextColor(0xFFDC2626); // Red
         }
     }
 
@@ -72,7 +82,7 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
     }
 
     static class ContributorViewHolder extends RecyclerView.ViewHolder {
-        TextView tvInitials, tvName, tvAmount, tvStatus, tvPercentage;
+        TextView tvInitials, tvName, tvAmount, tvStatus, tvPercentage, tvPersonalDueRefund;
         ProgressBar progressBar;
 
         public ContributorViewHolder(@NonNull View itemView) {
@@ -84,6 +94,7 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvPercentage = itemView.findViewById(R.id.tvPercentage);
             progressBar = itemView.findViewById(R.id.progressBar);
+            tvPersonalDueRefund = itemView.findViewById(R.id.tvPersonalDueRefund);
         }
     }
 }

@@ -1,47 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp">
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/ProfileInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Member Name"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:hint="মেম্বারের নাম"
+        app:startIconDrawable="@drawable/ic_user"
+        app:startIconTint="@color/primaryColor"
+        android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"/>
+            android:inputType="textPersonName"
+            android:textColor="@color/textColorPrimary" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/ProfileInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Amount Paid (৳)"
-        android:layout_marginTop="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:hint="পরিশোধিত টাকা (৳)"
+        app:startIconDrawable="@drawable/ic_dashboard_budget"
+        app:startIconTint="@color/primaryColor"
+        android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:textColor="@color/textColorPrimary" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Payment Method"
-        android:textColor="#64748B"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="4dp"/>
+        android:text="পরিশোধের মাধ্যম"
+        android:textColor="@color/textColorMuted"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
         
-    <Spinner
-        android:id="@+id/spinnerMethod"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@android:drawable/btn_dropdown"/>
+        android:layout_height="52dp"
+        android:background="@drawable/bg_input"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+        
+        <Spinner
+            android:id="@+id/spinnerMethod"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:spinnerMode="dropdown"/>
+            
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="@color/textColorMuted"
+            android:rotation="90"
+            android:clickable="false"
+            android:focusable="false"/>
+    </FrameLayout>
 
 </LinearLayout>

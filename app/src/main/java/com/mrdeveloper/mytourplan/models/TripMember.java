@@ -12,7 +12,7 @@ public class TripMember {
     @SerializedName("name")
     private String name;
 
-    @SerializedName("amount_paid")
+    @SerializedName(value = "amount_paid", alternate = {"paid_amount"})
     private double amountPaid;
 
     @SerializedName("payment_method")

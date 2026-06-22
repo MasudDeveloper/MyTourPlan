@@ -4,36 +4,49 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
+    android:background="@drawable/bg_screen_gradient">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primaryColor"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:background="@drawable/bg_card_gradient_blue"
+        app:elevation="0dp">
+
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="চূড়ান্ত হিসাব-নিকাশ" />
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@android:color/white"
+            app:title="চূড়ান্ত হিসাব-নিকাশ"
+            app:titleTextColor="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/bg_bottom_sheet_rounded"
+        android:layout_marginTop="36dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="36dp"
+            android:paddingBottom="24dp">
 
+            <!-- Per Person Expense Card -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/CardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/primaryColor"
                 android:layout_marginBottom="24dp">
+                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -53,14 +66,14 @@
                         android:id="@+id/tvPerPersonCost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="৳0"
+                        android:text="৳০"
                         android:textColor="@color/surfaceColor"
                         android:textSize="36sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Detailed Calculations Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,43 +83,110 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Detailed Calculations Card -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/CardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
+                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
                     
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="মোট মেম্বার" android:textColor="@color/textColorMuted"/>
-                        <TextView android:id="@+id/tvMembers" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textColor="@color/textColorPrimary"/>
+                    <LinearLayout 
+                        android:layout_width="match_parent" 
+                        android:layout_height="wrap_content" 
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView 
+                            android:layout_width="0dp" 
+                            android:layout_height="wrap_content" 
+                            android:layout_weight="1" 
+                            android:text="মোট মেম্বার" 
+                            android:textColor="@color/textColorMuted"
+                            android:textSize="14sp"/>
+                        <TextView 
+                            android:id="@+id/tvMembers" 
+                            android:layout_width="wrap_content" 
+                            android:layout_height="wrap_content" 
+                            android:text="0" 
+                            android:textStyle="bold" 
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="14sp"/>
                     </LinearLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginTop="12dp" android:layout_marginBottom="12dp"/>
                     
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="জনপ্রতি বাজেট" android:textColor="@color/textColorMuted"/>
-                        <TextView android:id="@+id/tvBudgetPerPerson" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="৳0" android:textStyle="bold" android:textColor="@color/textColorPrimary"/>
+                    <View 
+                        android:layout_width="match_parent" 
+                        android:layout_height="1dp" 
+                        android:background="#F1F5F9" 
+                        android:layout_marginTop="12dp" 
+                        android:layout_marginBottom="12dp"/>
+                    
+                    <LinearLayout 
+                        android:layout_width="match_parent" 
+                        android:layout_height="wrap_content" 
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView 
+                            android:layout_width="0dp" 
+                            android:layout_height="wrap_content" 
+                            android:layout_weight="1" 
+                            android:text="জনপ্রতি বাজেট" 
+                            android:textColor="@color/textColorMuted"
+                            android:textSize="14sp"/>
+                        <TextView 
+                            android:id="@+id/tvBudgetPerPerson" 
+                            android:layout_width="wrap_content" 
+                            android:layout_height="wrap_content" 
+                            android:text="৳০" 
+                            android:textStyle="bold" 
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="14sp"/>
                     </LinearLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginTop="12dp" android:layout_marginBottom="12dp"/>
                     
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="ট্যুরের মোট খরচ" android:textColor="@color/textColorMuted"/>
-                        <TextView android:id="@+id/tvTotalExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="৳0" android:textStyle="bold" android:textColor="@color/textColorPrimary"/>
+                    <View 
+                        android:layout_width="match_parent" 
+                        android:layout_height="1dp" 
+                        android:background="#F1F5F9" 
+                        android:layout_marginTop="12dp" 
+                        android:layout_marginBottom="12dp"/>
+                    
+                    <LinearLayout 
+                        android:layout_width="match_parent" 
+                        android:layout_height="wrap_content" 
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView 
+                            android:layout_width="0dp" 
+                            android:layout_height="wrap_content" 
+                            android:layout_weight="1" 
+                            android:text="ট্যুরের মোট খরচ" 
+                            android:textColor="@color/textColorMuted"
+                            android:textSize="14sp"/>
+                        <TextView 
+                            android:id="@+id/tvTotalExpense" 
+                            android:layout_width="wrap_content" 
+                            android:layout_height="wrap_content" 
+                            android:text="৳০" 
+                            android:textStyle="bold" 
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="14sp"/>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Personal Status Summary Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardResult"
                 style="@style/CardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/secondaryLightColor"
+                app:cardBackgroundColor="@color/primaryLightColor"
                 android:layout_marginBottom="32dp">
+                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,24 +201,25 @@
                         android:text="সবাইকে ফেরত দিতে হবে (জনপ্রতি)"
                         android:textColor="@color/surfaceColor"
                         android:textSize="16sp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center"/>
                         
                     <TextView
                         android:id="@+id/tvResultAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="৳0"
+                        android:text="৳০.০০"
                         android:textColor="@color/surfaceColor"
                         android:textSize="32sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Contributors Section -->
+            <!-- Contributors Section Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Traveler Contributions"
+                android:text="মেম্বারদের অবদান ও দেনা-পাওনা"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"

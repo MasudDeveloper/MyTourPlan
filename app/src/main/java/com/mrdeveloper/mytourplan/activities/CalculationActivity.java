@@ -60,6 +60,13 @@ public class CalculationActivity extends AppCompatActivity {
         rvContributors = findViewById(R.id.rvContributors);
         rvContributors.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
 
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         calculate(tripId);
     }
 

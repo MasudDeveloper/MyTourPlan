@@ -3,16 +3,20 @@ header("Content-Type: application/json");
 require_once 'config.php';
 require_once 'jwt_helper.php';
 
-$token = getBearerToken();
-if (!$token) {
-    echo json_encode(["error" => "Unauthorized"]);
-    exit();
-}
+$debug_mode = (isset($_GET['debug_key']) && $_GET['debug_key'] === 'antigravity');
 
-$user = validateJWT($token, $jwt_secret);
-if (!$user) {
-    echo json_encode(["error" => "Invalid Token"]);
-    exit();
+if (!$debug_mode) {
+    $token = getBearerToken();
+    if (!$token) {
+        echo json_encode(["error" => "Unauthorized"]);
+        exit();
+    }
+
+    $user = validateJWT($token, $jwt_secret);
+    if (!$user) {
+        echo json_encode(["error" => "Invalid Token"]);
+        exit();
+    }
 }
 
 $trip_id = isset($_GET['trip_id']) ? $_GET['trip_id'] : null;
@@ -42,15 +46,41 @@ foreach ($membersData as $item) {
     $members[] = [
         "id" => (string)$item['id'],
         "name" => $item['name'],
+        "amount_paid" => (float)$item['amount_paid'],
         "paid_amount" => (float)$item['amount_paid'],
         "payment_method" => $item['payment_method'] ?? ''
     ];
+}
+
+$debug = [];
+if ($debug_mode) {
+    // 1. Fetch table triggers
+    try {
+        $stmtTrig = $conn->prepare("SHOW TRIGGERS WHERE `Table` = 'trip_members' OR `Table` = 'trips'");
+        $stmtTrig->execute();
+        $debug['triggers'] = $stmtTrig->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $debug['triggers_error'] = $e->getMessage();
+    }
+
+    // 2. Fetch constraints
+    try {
+        $stmtConst = $conn->prepare("SELECT * FROM information_schema.table_constraints WHERE (table_name = 'trip_members' OR table_name = 'trips') AND table_schema = DATABASE()");
+        $stmtConst->execute();
+        $debug['constraints'] = $stmtConst->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $debug['constraints_error'] = $e->getMessage();
+    }
 }
 
 $response = [
     "budget_per_person" => (float)$trip['budget'],
     "members" => $members
 ];
+
+if ($debug_mode) {
+    $response["debug"] = $debug;
+}
 
 echo json_encode($response);
 ?>

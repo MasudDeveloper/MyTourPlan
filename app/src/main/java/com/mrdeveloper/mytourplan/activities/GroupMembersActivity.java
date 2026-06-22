@@ -119,25 +119,55 @@ public class GroupMembersActivity extends AppCompatActivity {
         }
 
         for (TripMember member : members) {
-            View memberView = getLayoutInflater().inflate(R.layout.item_group_member, null);
+            View memberView = getLayoutInflater().inflate(R.layout.item_group_member, layoutMemberList, false);
             
             TextView tvName = memberView.findViewById(R.id.tvName);
             TextView tvPaidMethod = memberView.findViewById(R.id.tvPaidMethod);
             TextView tvDueRefund = memberView.findViewById(R.id.tvDueRefund);
+            TextView tvInitials = memberView.findViewById(R.id.tvInitials);
+            TextView tvPercentage = memberView.findViewById(R.id.tvPercentage);
+            android.widget.ProgressBar progressBar = memberView.findViewById(R.id.progressBar);
             
             tvName.setText(member.getName());
-            tvPaidMethod.setText("Paid: ৳" + member.getAmountPaid() + " (" + member.getPaymentMethod() + ")");
+            tvPaidMethod.setText("Paid: ৳" + String.format("%.2f", member.getAmountPaid()) + " (" + member.getPaymentMethod() + ")");
+            
+            // Set Initials Avatar
+            String name = member.getName();
+            String initials = "MB";
+            if (name != null && !name.trim().isEmpty()) {
+                String[] parts = name.trim().split("\\s+");
+                if (parts.length >= 2) {
+                    initials = (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
+                } else {
+                    initials = name.trim().substring(0, Math.min(2, name.trim().length())).toUpperCase();
+                }
+            }
+            tvInitials.setText(initials);
+            
+            // Set Progress and Percentage
+            int percentage = budgetPerPerson > 0 ? (int) ((member.getAmountPaid() / budgetPerPerson) * 100) : 0;
+            tvPercentage.setText(percentage + "%");
+            progressBar.setProgress(Math.min(percentage, 100));
             
             double diff = member.getAmountPaid() - budgetPerPerson;
             if (diff < 0) {
                 tvDueRefund.setText("Due: ৳" + String.format("%.2f", Math.abs(diff)));
-                tvDueRefund.setTextColor(Color.parseColor("#DC2626")); // Red
+                int redColor = Color.parseColor("#DC2626");
+                tvDueRefund.setTextColor(redColor);
+                tvPercentage.setTextColor(redColor);
+                progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(redColor));
             } else if (diff > 0) {
                 tvDueRefund.setText("Refund: ৳" + String.format("%.2f", diff));
-                tvDueRefund.setTextColor(Color.parseColor("#16A34A")); // Green
+                int greenColor = Color.parseColor("#16A34A");
+                tvDueRefund.setTextColor(greenColor);
+                tvPercentage.setTextColor(greenColor);
+                progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(greenColor));
             } else {
                 tvDueRefund.setText("Cleared");
-                tvDueRefund.setTextColor(Color.parseColor("#64748B")); // Gray
+                int primaryColor = Color.parseColor("#0056D2");
+                tvDueRefund.setTextColor(primaryColor);
+                tvPercentage.setTextColor(primaryColor);
+                progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(primaryColor));
             }
             
             memberView.setOnLongClickListener(v -> {
@@ -226,7 +256,13 @@ public class GroupMembersActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    loadMembersData();
+                    SyncGenericResponse body = response.body();
+                    if (body.isSuccess()) {
+                        loadMembersData();
+                    } else {
+                        String errorMsg = body.getError() != null && !body.getError().isEmpty() ? body.getError() : "Failed to sync member";
+                        Toast.makeText(GroupMembersActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(GroupMembersActivity.this, "Failed to sync member", Toast.LENGTH_SHORT).show();
                 }
