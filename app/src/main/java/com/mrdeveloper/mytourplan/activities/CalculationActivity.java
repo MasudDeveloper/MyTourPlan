@@ -72,7 +72,7 @@ public class CalculationActivity extends AppCompatActivity {
 
     private void calculate(int tripId) {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -133,7 +133,7 @@ public class CalculationActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ExpenseTrackerResponse> call, Throwable t) {
-                Toast.makeText(CalculationActivity.this, "Failed to load calculation", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CalculationActivity.this, "হিসাব লোড করা যায়নি", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -63,7 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/textColorPrimary"
-                    android:hint="কত নম্বর দিন? (Day 1, 2...)"
+                    android:hint="কত নম্বর দিন? (যেমন: ১, ২...)"
                     android:inputType="number"
                     android:paddingVertical="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -92,7 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/textColorPrimary"
-                    android:hint="সময় (10:00 AM)"
+                    android:hint="সময় (যেমন: সকাল ১০:০০)"
                     android:focusable="false"
                     android:clickable="true"
                     android:paddingVertical="14dp" />

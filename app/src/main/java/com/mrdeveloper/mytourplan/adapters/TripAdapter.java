@@ -47,9 +47,16 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
         Trip trip = trips.get(position);
         holder.tvDestination.setText(trip.getDestination());
-        holder.tvDates.setText(trip.getStartDate() + " - " + trip.getEndDate());
-        holder.tvStatus.setText(trip.getStatus() != null ? trip.getStatus() : "Upcoming");
-        holder.tvMembers.setText(trip.getMembersCount() + " People");
+        holder.tvDates.setText(trip.getStartDate() + " থেকে " + trip.getEndDate());
+        String status = trip.getStatus() != null ? trip.getStatus() : "Upcoming";
+        if ("Upcoming".equalsIgnoreCase(status)) {
+            holder.tvStatus.setText("আসন্ন");
+        } else if ("Completed".equalsIgnoreCase(status)) {
+            holder.tvStatus.setText("সম্পন্ন");
+        } else {
+            holder.tvStatus.setText(status);
+        }
+        holder.tvMembers.setText(trip.getMembersCount() + " জন");
         holder.tvBudget.setText("৳ " + trip.getBudget());
 
         String imageUri = trip.getImageUri();

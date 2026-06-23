@@ -122,7 +122,7 @@ public class TripDashboardActivity extends AppCompatActivity {
 
     private void loadTripData() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "You are offline", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "আপনি অফলাইনে আছেন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -138,7 +138,7 @@ public class TripDashboardActivity extends AppCompatActivity {
                         if (trip != null) {
                             int totalMembers = trip.getMembersCount();
                             double budgetPerPerson = trip.getBudget();
-                            if (tvTripDates != null) tvTripDates.setText(trip.getStartDate() + " - " + trip.getEndDate());
+                            if (tvTripDates != null) tvTripDates.setText(trip.getStartDate() + " থেকে " + trip.getEndDate());
                             if (collapsingToolbar != null) collapsingToolbar.setTitle(trip.getDestination());
                             
                             if (ivDashboardCover != null && trip.getImageUri() != null && !trip.getImageUri().isEmpty()) {
@@ -167,11 +167,10 @@ public class TripDashboardActivity extends AppCompatActivity {
                                     tvTitle.setText(expense.getCategory());
                                     tvSubtitle.setText(expense.getNote() == null || expense.getNote().isEmpty() ? expense.getCategory() : expense.getNote());
                                     tvAmount.setText("-৳" + String.format("%.2f", expense.getAmount()));
-                                    
-                                    expenseView.setOnLongClickListener(v -> {
+                                                                      expenseView.setOnLongClickListener(v -> {
                                         new android.app.AlertDialog.Builder(TripDashboardActivity.this)
-                                            .setTitle("Manage Expense")
-                                            .setItems(new CharSequence[]{"Edit", "Delete"}, (dialog, which) -> {
+                                            .setTitle("খরচ পরিচালনা")
+                                            .setItems(new CharSequence[]{"সম্পাদনা করুন", "মুছে ফেলুন"}, (dialog, which) -> {
                                                 if (which == 0) {
                                                     Intent intent = new Intent(TripDashboardActivity.this, AddExpenseActivity.class);
                                                     intent.putExtra("trip_id", tripId);
@@ -182,9 +181,9 @@ public class TripDashboardActivity extends AppCompatActivity {
                                                     startActivity(intent);
                                                 } else if (which == 1) {
                                                     new android.app.AlertDialog.Builder(TripDashboardActivity.this)
-                                                        .setTitle("Delete Expense")
-                                                        .setMessage("Are you sure you want to delete this expense?")
-                                                        .setPositiveButton("Yes", (d, w) -> {
+                                                        .setTitle("খরচ মুছে ফেলুন")
+                                                        .setMessage("আপনি কি নিশ্চিতভাবে এই খরচটি মুছে ফেলতে চান?")
+                                                        .setPositiveButton("হ্যাঁ", (d, w) -> {
                                                             ApiService service = ApiClient.getClient().create(ApiService.class);
                                                             service.syncExpense("Bearer " + token, String.valueOf(tripId), "", 0, "", "", "", "DELETE", Integer.parseInt(expense.getId())).enqueue(new Callback<com.mrdeveloper.mytourplan.models.SyncGenericResponse>() {
                                                                 @Override
@@ -192,16 +191,16 @@ public class TripDashboardActivity extends AppCompatActivity {
                                                                     if (res.isSuccessful()) {
                                                                         loadTripData();
                                                                     } else {
-                                                                        Toast.makeText(TripDashboardActivity.this, "Failed to delete", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(TripDashboardActivity.this, "মুছে ফেলা যায়নি", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 }
                                                                 @Override
                                                                 public void onFailure(Call<com.mrdeveloper.mytourplan.models.SyncGenericResponse> c, Throwable t) {
-                                                                    Toast.makeText(TripDashboardActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(TripDashboardActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                                                                 }
                                                             });
                                                         })
-                                                        .setNegativeButton("No", null)
+                                                        .setNegativeButton("না", null)
                                                         .show();
                                                 }
                                             })
@@ -240,7 +239,7 @@ public class TripDashboardActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TripDashboardResponse> call, Throwable t) {
-                Toast.makeText(TripDashboardActivity.this, "Failed to load trip", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TripDashboardActivity.this, "ট্যুর তথ্য লোড করা যায়নি", Toast.LENGTH_SHORT).show();
             }
         });
     }

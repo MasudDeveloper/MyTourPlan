@@ -58,7 +58,7 @@ public class GroupMembersActivity extends AppCompatActivity {
         tripId = getIntent().getStringExtra("trip_id");
         
         if (tripId == null) {
-            Toast.makeText(this, "Invalid Trip", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ত্রুটিপূর্ণ ট্যুর তথ্য", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -77,7 +77,7 @@ public class GroupMembersActivity extends AppCompatActivity {
     
     private void loadMembersData() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -102,7 +102,7 @@ public class GroupMembersActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MembersResponse> call, Throwable t) {
-                Toast.makeText(GroupMembersActivity.this, "Failed to load members", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupMembersActivity.this, "মেম্বার লোড করা যায়নি", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -129,7 +129,7 @@ public class GroupMembersActivity extends AppCompatActivity {
             android.widget.ProgressBar progressBar = memberView.findViewById(R.id.progressBar);
             
             tvName.setText(member.getName());
-            tvPaidMethod.setText("Paid: ৳" + String.format("%.2f", member.getAmountPaid()) + " (" + member.getPaymentMethod() + ")");
+            tvPaidMethod.setText("পরিশোধিত: ৳" + String.format("%.2f", member.getAmountPaid()) + " (" + getPaymentMethodBn(member.getPaymentMethod()) + ")");
             
             // Set Initials Avatar
             String name = member.getName();
@@ -151,19 +151,19 @@ public class GroupMembersActivity extends AppCompatActivity {
             
             double diff = member.getAmountPaid() - budgetPerPerson;
             if (diff < 0) {
-                tvDueRefund.setText("Due: ৳" + String.format("%.2f", Math.abs(diff)));
+                tvDueRefund.setText("বাকি: ৳" + String.format("%.2f", Math.abs(diff)));
                 int redColor = Color.parseColor("#DC2626");
                 tvDueRefund.setTextColor(redColor);
                 tvPercentage.setTextColor(redColor);
                 progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(redColor));
             } else if (diff > 0) {
-                tvDueRefund.setText("Refund: ৳" + String.format("%.2f", diff));
+                tvDueRefund.setText("ফেরত: ৳" + String.format("%.2f", diff));
                 int greenColor = Color.parseColor("#16A34A");
                 tvDueRefund.setTextColor(greenColor);
                 tvPercentage.setTextColor(greenColor);
                 progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(greenColor));
             } else {
-                tvDueRefund.setText("Cleared");
+                tvDueRefund.setText("পরিশোধিত");
                 int primaryColor = Color.parseColor("#0056D2");
                 tvDueRefund.setTextColor(primaryColor);
                 tvPercentage.setTextColor(primaryColor);
@@ -172,20 +172,20 @@ public class GroupMembersActivity extends AppCompatActivity {
             
             memberView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(this)
-                    .setTitle("Manage Member")
-                    .setItems(new CharSequence[]{"Add Payment", "Edit", "Delete"}, (dialog, which) -> {
+                    .setTitle("মেম্বার পরিচালনা")
+                    .setItems(new CharSequence[]{"পেমেন্ট যোগ করুন", "সম্পাদনা করুন", "মুছে ফেলুন"}, (dialog, which) -> {
                         if (which == 0) {
                             showAddPaymentDialog(member);
                         } else if (which == 1) {
                             showAddMemberDialog(member);
                         } else if (which == 2) {
                             new AlertDialog.Builder(this)
-                                .setTitle("Delete Member")
-                                .setMessage("Are you sure you want to delete this member?")
-                                .setPositiveButton("Yes", (d, w) -> {
+                                .setTitle("মেম্বার মুছে ফেলুন")
+                                .setMessage("আপনি কি নিশ্চিতভাবে এই মেম্বারকে মুছে ফেলতে চান?")
+                                .setPositiveButton("হ্যাঁ", (d, w) -> {
                                     syncMemberAPI("DELETE", Integer.parseInt(member.getId()), "", 0, "");
                                 })
-                                .setNegativeButton("No", null)
+                                .setNegativeButton("না", null)
                                 .show();
                         }
                     })
@@ -203,15 +203,16 @@ public class GroupMembersActivity extends AppCompatActivity {
         EditText etAmount = view.findViewById(R.id.etAmount);
         Spinner spinnerMethod = view.findViewById(R.id.spinnerMethod);
         
-        String[] methods = {"Cash", "bKash", "Nagad", "Bank Transfer"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, methods);
+        String[] methodsBn = {"ক্যাশ", "বিকাশ", "নগদ", "ব্যাংক ট্রান্সফার"};
+        String[] methodsEn = {"Cash", "bKash", "Nagad", "Bank Transfer"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, methodsBn);
         spinnerMethod.setAdapter(adapter);
         
         if (existingMember != null) {
             etName.setText(existingMember.getName());
             etAmount.setText(String.valueOf(existingMember.getAmountPaid()));
-            for (int i = 0; i < methods.length; i++) {
-                if (methods[i].equals(existingMember.getPaymentMethod())) {
+            for (int i = 0; i < methodsEn.length; i++) {
+                if (methodsEn[i].equalsIgnoreCase(existingMember.getPaymentMethod())) {
                     spinnerMethod.setSelection(i);
                     break;
                 }
@@ -219,15 +220,16 @@ public class GroupMembersActivity extends AppCompatActivity {
         }
         
         new AlertDialog.Builder(this)
-            .setTitle(existingMember == null ? "Add Member" : "Edit Member")
+            .setTitle(existingMember == null ? "মেম্বার যোগ করুন" : "মেম্বার সংশোধন")
             .setView(view)
-            .setPositiveButton("Save", (dialog, which) -> {
+            .setPositiveButton("সংরক্ষণ", (dialog, which) -> {
                 String name = etName.getText().toString().trim();
                 String amountStr = etAmount.getText().toString().trim();
-                String method = spinnerMethod.getSelectedItem().toString();
+                int selectedPos = spinnerMethod.getSelectedItemPosition();
+                String method = methodsEn[selectedPos >= 0 && selectedPos < methodsEn.length ? selectedPos : 0];
                 
                 if (name.isEmpty() || amountStr.isEmpty()) {
-                    Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "সবগুলো ফিল্ড পূরণ করুন", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 
@@ -239,13 +241,13 @@ public class GroupMembersActivity extends AppCompatActivity {
                     syncMemberAPI("UPDATE", Integer.parseInt(existingMember.getId()), name, amount, method);
                 }
             })
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("বাতিল", null)
             .show();
     }
 
     private void syncMemberAPI(String action, int serverId, String name, double amountPaid, String paymentMethod) {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -260,17 +262,17 @@ public class GroupMembersActivity extends AppCompatActivity {
                     if (body.isSuccess()) {
                         loadMembersData();
                     } else {
-                        String errorMsg = body.getError() != null && !body.getError().isEmpty() ? body.getError() : "Failed to sync member";
+                        String errorMsg = body.getError() != null && !body.getError().isEmpty() ? body.getError() : "মেম্বার সিঙ্ক করা যায়নি";
                         Toast.makeText(GroupMembersActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(GroupMembersActivity.this, "Failed to sync member", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupMembersActivity.this, "মেম্বার সিঙ্ক করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
-                Toast.makeText(GroupMembersActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupMembersActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -284,19 +286,21 @@ public class GroupMembersActivity extends AppCompatActivity {
         etName.setText(member.getName());
         etName.setEnabled(false); // Can't change name here
         
-        String[] methods = {"Cash", "bKash", "Nagad", "Bank Transfer"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, methods);
+        String[] methodsBn = {"ক্যাশ", "বিকাশ", "নগদ", "ব্যাংক ট্রান্সফার"};
+        String[] methodsEn = {"Cash", "bKash", "Nagad", "Bank Transfer"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, methodsBn);
         spinnerMethod.setAdapter(adapter);
         
         new AlertDialog.Builder(this)
-            .setTitle("Add Payment")
+            .setTitle("পেমেন্ট যোগ করুন")
             .setView(view)
-            .setPositiveButton("Add", (dialog, which) -> {
+            .setPositiveButton("যোগ করুন", (dialog, which) -> {
                 String amountStr = etAmount.getText().toString().trim();
-                String method = spinnerMethod.getSelectedItem().toString();
+                int selectedPos = spinnerMethod.getSelectedItemPosition();
+                String method = methodsEn[selectedPos >= 0 && selectedPos < methodsEn.length ? selectedPos : 0];
                 
                 if (amountStr.isEmpty()) {
-                    Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "দয়া করে টাকার পরিমাণ লিখুন", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 
@@ -305,7 +309,18 @@ public class GroupMembersActivity extends AppCompatActivity {
                 
                 syncMemberAPI("UPDATE", Integer.parseInt(member.getId()), member.getName(), newTotal, method);
             })
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("বাতিল", null)
             .show();
+    }
+
+    private String getPaymentMethodBn(String englishMethod) {
+        if (englishMethod == null) return "";
+        switch (englishMethod.toLowerCase()) {
+            case "cash": return "ক্যাশ";
+            case "bkash": return "বিকাশ";
+            case "nagad": return "নগদ";
+            case "bank transfer": return "ব্যাংক ট্রান্সফার";
+            default: return englishMethod;
+        }
     }
 }

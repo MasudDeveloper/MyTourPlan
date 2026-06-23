@@ -53,21 +53,21 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
 
         // Format status text and colors
         if ("Paid".equalsIgnoreCase(contributor.getStatus())) {
-            holder.tvStatus.setText("Fully Paid");
+            holder.tvStatus.setText("সম্পূর্ণ পরিশোধিত");
             holder.tvStatus.setTextColor(0xFF4CAF50); // Green
             holder.tvPercentage.setTextColor(0xFF4CAF50);
             holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
             holder.tvPersonalDueRefund.setText("পরিশোধিত (কোনো দেনা-পাওনা নেই)");
             holder.tvPersonalDueRefund.setTextColor(0xFF4CAF50);
         } else if ("Refund".equalsIgnoreCase(contributor.getStatus())) {
-            holder.tvStatus.setText(String.format(java.util.Locale.US, "Refund: ৳ %.2f", Math.abs(totalDue)));
+            holder.tvStatus.setText(String.format(java.util.Locale.US, "ফেরত: ৳ %.2f", Math.abs(totalDue)));
             holder.tvStatus.setTextColor(0xFF4CAF50); // Green
             holder.tvPercentage.setTextColor(0xFF4CAF50);
             holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
             holder.tvPersonalDueRefund.setText(String.format(java.util.Locale.US, "ফেরত পাবেন: ৳ %,.2f", Math.abs(totalDue)));
             holder.tvPersonalDueRefund.setTextColor(0xFF4CAF50);
         } else {
-            holder.tvStatus.setText(String.format(java.util.Locale.US, "Due: ৳ %.2f", totalDue));
+            holder.tvStatus.setText(String.format(java.util.Locale.US, "বাকি: ৳ %.2f", totalDue));
             holder.tvStatus.setTextColor(0xFFE65100); // Orange
             holder.tvPercentage.setTextColor(0xFFE65100);
             holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFFE65100));

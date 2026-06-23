@@ -184,7 +184,7 @@ public class TripNotesActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TripNotesResponse> call, Throwable t) {
-                Toast.makeText(TripNotesActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(TripNotesActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -281,7 +281,7 @@ public class TripNotesActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
-                        Toast.makeText(TripNotesActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TripNotesActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -351,7 +351,7 @@ public class TripNotesActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
-                        Toast.makeText(TripNotesActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TripNotesActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

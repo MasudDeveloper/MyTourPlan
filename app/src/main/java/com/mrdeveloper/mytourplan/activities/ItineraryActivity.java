@@ -90,7 +90,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
     private void loadItinerary() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "You are offline", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "আপনি অফলাইনে আছেন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -121,14 +121,14 @@ public class ItineraryActivity extends AppCompatActivity {
                         Toast.makeText(ItineraryActivity.this, data.getError(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(ItineraryActivity.this, "Failed to load itinerary", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ItineraryActivity.this, "ভ্রমণ পরিকল্পনা লোড করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ItineraryResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(ItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItineraryActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -160,7 +160,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
     private void deleteItinerary(ItineraryItem item) {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -180,7 +180,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
-                Toast.makeText(ItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItineraryActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

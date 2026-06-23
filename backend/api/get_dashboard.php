@@ -40,7 +40,9 @@ if ($tripData) {
     $response["upcoming_trip"] = [
         "id" => (string)$tripData['id'],
         "user_id" => (string)$tripData['user_id'],
+        "from_location" => $tripData['from_location'] ?? "",
         "destination" => $tripData['destination'],
+        "image_uri" => $tripData['image_uri'] ?? "",
         "start_date" => $tripData['start_date'],
         "end_date" => $tripData['end_date'],
         "members_count" => (int)$tripData['members_count'],

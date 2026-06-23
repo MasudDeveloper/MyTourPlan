@@ -104,7 +104,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="STATUS"
+                    android:text="অবস্থা"
                     android:textColor="#94A3B8"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -134,7 +134,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MEMBERS"
+                    android:text="মেম্বার"
                     android:textColor="#94A3B8"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -164,7 +164,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BUDGET"
+                    android:text="বাজেট"
                     android:textColor="#94A3B8"
                     android:textSize="10sp"
                     android:textStyle="bold" />

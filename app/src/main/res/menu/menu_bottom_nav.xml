@@ -3,17 +3,17 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:title="হোম" />
     <item
         android:id="@+id/nav_plan_trip"
         android:icon="@drawable/ic_plan_trip"
-        android:title="Plan Trip" />
+        android:title="পরিকল্পনা" />
     <item
         android:id="@+id/nav_my_trips"
         android:icon="@drawable/ic_my_trips"
-        android:title="My Trips" />
+        android:title="আমার ট্যুরসমূহ" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile"
-        android:title="Profile" />
+        android:title="প্রোফাইল" />
 </menu>

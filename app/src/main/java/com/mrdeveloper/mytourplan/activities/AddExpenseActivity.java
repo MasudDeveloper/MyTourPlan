@@ -49,7 +49,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         tripId = getIntent().getIntExtra("trip_id", -1);
 
         if (tripId == -1) {
-            Toast.makeText(this, "Invalid Trip ID", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ত্রুটিপূর্ণ ট্যুর আইডি", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -84,7 +84,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         double amount = Double.parseDouble(amountStr);
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -115,7 +115,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 btnSaveExpense.setEnabled(true);
                 btnSaveExpense.setText(expenseId != null ? "খরচ আপডেট করুন" : "সেভ করুন");
-                Toast.makeText(AddExpenseActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddExpenseActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
