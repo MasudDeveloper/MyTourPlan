@@ -22,6 +22,7 @@ import com.mrdeveloper.mytourplan.api.ApiClient;
 import com.mrdeveloper.mytourplan.api.ApiService;
 import com.mrdeveloper.mytourplan.models.ItineraryItem;
 import com.mrdeveloper.mytourplan.models.ItineraryResponse;
+import com.mrdeveloper.mytourplan.models.SyncGenericResponse;
 import com.mrdeveloper.mytourplan.utils.NetworkUtils;
 import com.mrdeveloper.mytourplan.utils.SharedPrefs;
 
@@ -111,7 +112,9 @@ public class ItineraryActivity extends AppCompatActivity {
 
                         List<ItineraryItem> items = data.getSchedule();
                         if (items != null) {
-                            adapter = new ItineraryTimelineAdapter(items);
+                            adapter = new ItineraryTimelineAdapter(items, item -> {
+                                manageItinerary(item);
+                            });
                             rvItinerary.setAdapter(adapter);
                         }
                     } else {
@@ -125,6 +128,58 @@ public class ItineraryActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ItineraryResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
+                Toast.makeText(ItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void manageItinerary(ItineraryItem item) {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("ভ্রমণ পরিকল্পনা")
+            .setItems(new CharSequence[]{"সম্পাদনা করুন", "মুছে ফেলুন"}, (dialog, which) -> {
+                if (which == 0) {
+                    Intent intent = new Intent(ItineraryActivity.this, AddItineraryActivity.class);
+                    intent.putExtra("trip_id", tripId);
+                    intent.putExtra("itinerary_id", item.getId());
+                    intent.putExtra("day", item.getDay());
+                    intent.putExtra("time", item.getTime());
+                    intent.putExtra("activity", item.getActivity());
+                    intent.putExtra("location", item.getLocation());
+                    startActivity(intent);
+                } else if (which == 1) {
+                    new android.app.AlertDialog.Builder(ItineraryActivity.this)
+                        .setTitle("পরিকল্পনা মুছে ফেলুন")
+                        .setMessage("আপনি কি নিশ্চিতভাবে এই পরিকল্পনাটি মুছে ফেলতে চান?")
+                        .setPositiveButton("হ্যাঁ", (d, w) -> deleteItinerary(item))
+                        .setNegativeButton("না", null)
+                        .show();
+                }
+            })
+            .show();
+    }
+
+    private void deleteItinerary(ItineraryItem item) {
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            Toast.makeText(this, "Internet connection required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sharedPrefs.getToken();
+
+        apiService.syncItinerary("Bearer " + token, tripId, item.getDay(), item.getTime(), item.getActivity(), item.getLocation(), "", "DELETE", item.getId()).enqueue(new Callback<SyncGenericResponse>() {
+            @Override
+            public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ItineraryActivity.this, "পরিকল্পনা মুছে ফেলা হয়েছে!", Toast.LENGTH_SHORT).show();
+                    loadItinerary();
+                } else {
+                    Toast.makeText(ItineraryActivity.this, "মুছে ফেলা যায়নি", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 Toast.makeText(ItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

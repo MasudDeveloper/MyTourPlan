@@ -81,9 +81,9 @@ public class MyTripsFragment extends Fragment {
             @Override
             public void onDeleteClick(Trip trip) {
                 new AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Trip")
-                    .setMessage("Are you sure you want to delete this trip? This action cannot be undone.")
-                    .setPositiveButton("Delete", (dialog, which) -> {
+                    .setTitle("ট্যুর মুছে ফেলুন")
+                    .setMessage("আপনি কি নিশ্চিতভাবে এই ট্যুরটি মুছে ফেলতে চান? এই কাজটি আর ফিরিয়ে আনা যাবে না।")
+                    .setPositiveButton("মুছে ফেলুন", (dialog, which) -> {
                         progressBar.setVisibility(View.VISIBLE);
                         String token = new SharedPrefs(getContext()).getToken();
                         ApiService apiService = ApiClient.getClient().create(ApiService.class);
@@ -93,20 +93,20 @@ public class MyTripsFragment extends Fragment {
                             public void onResponse(Call<com.mrdeveloper.mytourplan.models.GenericResponse> call, Response<com.mrdeveloper.mytourplan.models.GenericResponse> response) {
                                 progressBar.setVisibility(View.GONE);
                                 if (response.isSuccessful()) {
-                                    Toast.makeText(getContext(), "Trip deleted successfully", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "ট্যুরটি সফলভাবে মুছে ফেলা হয়েছে", Toast.LENGTH_SHORT).show();
                                     loadTrips();
                                 } else {
-                                    Toast.makeText(getContext(), "Failed to delete trip", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "ট্যুরটি মুছে ফেলা যায়নি", Toast.LENGTH_SHORT).show();
                                 }
                             }
                             @Override
                             public void onFailure(Call<com.mrdeveloper.mytourplan.models.GenericResponse> call, Throwable t) {
                                 progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("বাতিল", null)
                     .show();
             }
 
@@ -171,7 +171,7 @@ public class MyTripsFragment extends Fragment {
                     if (!isAdded() || getContext() == null) return;
                     progressBar.setVisibility(View.GONE);
                     swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(getContext(), "Failed to fetch online trips", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "ট্যুর তালিকা লোড করা যায়নি", Toast.LENGTH_SHORT).show();
                     layoutEmptyState.setVisibility(View.VISIBLE);
                 }
             });
@@ -179,7 +179,7 @@ public class MyTripsFragment extends Fragment {
             progressBar.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(false);
             layoutEmptyState.setVisibility(View.VISIBLE);
-            Toast.makeText(getContext(), "You are offline. Internet connection required.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "আপনি অফলাইনে আছেন। ইন্টারনেট সংযোগ প্রয়োজন।", Toast.LENGTH_SHORT).show();
         }
     }
 }

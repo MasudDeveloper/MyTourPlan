@@ -34,6 +34,7 @@ public class AddItineraryActivity extends AppCompatActivity {
     private EditText etDay, etTime, etActivity, etLocation;
     private Button btnSaveItinerary;
     private String tripId;
+    private int itineraryId = -1;
     private SharedPrefs sharedPrefs;
 
     @Override
@@ -59,11 +60,24 @@ public class AddItineraryActivity extends AppCompatActivity {
             return;
         }
 
+        itineraryId = getIntent().getIntExtra("itinerary_id", -1);
+
         etDay = findViewById(R.id.etDay);
         etTime = findViewById(R.id.etTime);
         etActivity = findViewById(R.id.etActivity);
         etLocation = findViewById(R.id.etLocation);
         btnSaveItinerary = findViewById(R.id.btnSaveItinerary);
+
+        if (itineraryId != -1) {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("পরিকল্পনা সংশোধন");
+            }
+            btnSaveItinerary.setText("সংশোধন করুন");
+            etDay.setText(String.valueOf(getIntent().getIntExtra("day", 1)));
+            etTime.setText(getIntent().getStringExtra("time"));
+            etActivity.setText(getIntent().getStringExtra("activity"));
+            etLocation.setText(getIntent().getStringExtra("location"));
+        }
 
         etTime.setOnClickListener(v -> showTimePicker());
 
@@ -116,31 +130,34 @@ public class AddItineraryActivity extends AppCompatActivity {
         }
 
         btnSaveItinerary.setEnabled(false);
-        btnSaveItinerary.setText("Saving...");
+        btnSaveItinerary.setText(itineraryId != -1 ? "সংরক্ষণ করা হচ্ছে..." : "যোগ করা হচ্ছে...");
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String token = sharedPrefs.getToken();
 
-        Log.d(TAG, "Syncing itinerary: trip_id=" + tripId + ", day=" + day + ", time=" + time + ", activity=" + activity + ", location=" + location);
+        String action = itineraryId != -1 ? "UPDATE" : "INSERT";
+        int serverId = itineraryId != -1 ? itineraryId : -1;
 
-        apiService.syncItinerary("Bearer " + token, tripId, day, time, activity, location, "").enqueue(new Callback<SyncGenericResponse>() {
+        Log.d(TAG, "Syncing itinerary: trip_id=" + tripId + ", day=" + day + ", time=" + time + ", activity=" + activity + ", location=" + location + ", action=" + action + ", server_id=" + serverId);
+
+        apiService.syncItinerary("Bearer " + token, tripId, day, time, activity, location, "", action, serverId).enqueue(new Callback<SyncGenericResponse>() {
             @Override
             public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     SyncGenericResponse body = response.body();
                     if (body.isSuccess()) {
-                        Toast.makeText(AddItineraryActivity.this, "Activity Added", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddItineraryActivity.this, itineraryId != -1 ? "পরিকল্পনা সফলভাবে সংশোধন করা হয়েছে!" : "পরিকল্পনা সফলভাবে যোগ করা হয়েছে!", Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
                         btnSaveItinerary.setEnabled(true);
-                        btnSaveItinerary.setText("যোগ করুন");
+                        btnSaveItinerary.setText(itineraryId != -1 ? "সংশোধন করুন" : "যোগ করুন");
                         String errorMsg = body.getError() != null ? body.getError() : "Unknown server error";
                         Log.e(TAG, "Server returned error: " + errorMsg);
                         Toast.makeText(AddItineraryActivity.this, "Failed: " + errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } else {
                     btnSaveItinerary.setEnabled(true);
-                    btnSaveItinerary.setText("যোগ করুন");
+                    btnSaveItinerary.setText(itineraryId != -1 ? "সংশোধন করুন" : "যোগ করুন");
                     String errorDetail = "HTTP " + response.code();
                     try {
                         if (response.errorBody() != null) {
@@ -157,7 +174,7 @@ public class AddItineraryActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 btnSaveItinerary.setEnabled(true);
-                btnSaveItinerary.setText("যোগ করুন");
+                btnSaveItinerary.setText(itineraryId != -1 ? "সংশোধন করুন" : "যোগ করুন");
                 Log.e(TAG, "Network error syncing itinerary", t);
                 Toast.makeText(AddItineraryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }

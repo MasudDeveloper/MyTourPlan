@@ -105,9 +105,9 @@ public class AddTripActivity extends AppCompatActivity {
             isEditMode = true;
             editTripId = getIntent().getStringExtra("edit_trip_id");
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle("Update Trip");
+                getSupportActionBar().setTitle("ট্যুর সংশোধন");
             }
-            btnCreateTrip.setText("Update Trip");
+            btnCreateTrip.setText("ট্যুর সংশোধন");
             loadTripData(editTripId);
         }
     }
@@ -167,12 +167,12 @@ public class AddTripActivity extends AppCompatActivity {
         int userId = sharedPrefs.getUserId();
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required to save trip", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ট্যুর সংরক্ষণ করার জন্য ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
         btnCreateTrip.setEnabled(false);
-        btnCreateTrip.setText("Saving...");
+        btnCreateTrip.setText("সংরক্ষণ করা হচ্ছে...");
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String token = sharedPrefs.getToken();
@@ -218,15 +218,15 @@ public class AddTripActivity extends AppCompatActivity {
                         finish();
                     } else {
                         btnCreateTrip.setEnabled(true);
-                        btnCreateTrip.setText("Update Trip");
+                        btnCreateTrip.setText("ট্যুর সংশোধন");
                         Toast.makeText(AddTripActivity.this, "ট্যুর আপডেট করা যায়নি", Toast.LENGTH_SHORT).show();
                     }
                 }
                 @Override
                 public void onFailure(Call<GenericResponse> call, Throwable t) {
                     btnCreateTrip.setEnabled(true);
-                    btnCreateTrip.setText("Update Trip");
-                    Toast.makeText(AddTripActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    btnCreateTrip.setText("ট্যুর সংশোধন");
+                    Toast.makeText(AddTripActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -242,15 +242,15 @@ public class AddTripActivity extends AppCompatActivity {
                         finish();
                     } else {
                         btnCreateTrip.setEnabled(true);
-                        btnCreateTrip.setText("Create Trip");
+                        btnCreateTrip.setText("নতুন ট্যুর তৈরি করুন");
                         Toast.makeText(AddTripActivity.this, "ট্যুর তৈরি করা যায়নি", Toast.LENGTH_SHORT).show();
                     }
                 }
                 @Override
                 public void onFailure(Call<SyncTripResponse> call, Throwable t) {
                     btnCreateTrip.setEnabled(true);
-                    btnCreateTrip.setText("Create Trip");
-                    Toast.makeText(AddTripActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    btnCreateTrip.setText("নতুন ট্যুর তৈরি করুন");
+                    Toast.makeText(AddTripActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }

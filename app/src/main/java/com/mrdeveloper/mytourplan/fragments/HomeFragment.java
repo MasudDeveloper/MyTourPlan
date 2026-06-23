@@ -96,11 +96,11 @@ public class HomeFragment extends Fragment {
         });
 
         view.findViewById(R.id.cvExplore).setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Explore feature coming soon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "এক্সপ্লোর ফিচারটি শীঘ্রই আসছে!", Toast.LENGTH_SHORT).show();
         });
 
         view.findViewById(R.id.cvSaved).setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Saved feature coming soon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "সংরক্ষিত ফিচারটি শীঘ্রই আসছে!", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -113,10 +113,10 @@ public class HomeFragment extends Fragment {
     private void loadDashboardData() {
         if (getContext() == null) return;
 
-        if (tvWelcome != null) tvWelcome.setText("Welcome back"); // Fallback text
+        if (tvWelcome != null) tvWelcome.setText("স্বাগতম"); // Fallback text
 
         if (!NetworkUtils.isNetworkAvailable(getContext())) {
-            Toast.makeText(getContext(), "You are offline.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "আপনি অফলাইনে আছেন।", Toast.LENGTH_SHORT).show();
             showEmptyUpcomingTrip();
             return;
         }
@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment {
                     DashboardResponse data = response.body();
                     
                     if (data.getError() == null || data.getError().isEmpty()) {
-                        if (tvWelcome != null) tvWelcome.setText("Welcome back, " + data.getUserName());
+                        if (tvWelcome != null) tvWelcome.setText("স্বাগতম, " + data.getUserName());
                         
                         // Load user profile picture dynamically
                         String profilePicUrl = sharedPrefs.getProfilePic();
@@ -150,11 +150,11 @@ public class HomeFragment extends Fragment {
                         Trip upcoming = data.getUpcomingTrip();
                         if (upcoming != null && upcoming.getId() != null) {
                             if (tvUpcomingDest != null) tvUpcomingDest.setText(upcoming.getDestination());
-                            if (tvUpcomingDates != null) tvUpcomingDates.setText(upcoming.getStartDate() + " to " + upcoming.getEndDate());
-                            if (tvUpcomingMembers != null) tvUpcomingMembers.setText(String.valueOf(upcoming.getMembersCount()) + " Members");
+                            if (tvUpcomingDates != null) tvUpcomingDates.setText(upcoming.getStartDate() + " থেকে " + upcoming.getEndDate());
+                            if (tvUpcomingMembers != null) tvUpcomingMembers.setText(String.valueOf(upcoming.getMembersCount()) + " জন মেম্বার");
                             double totalBudget = upcoming.getBudget() * upcoming.getMembersCount();
                             if (tvUpcomingBudget != null) tvUpcomingBudget.setText(String.format("৳%.2f", totalBudget));
-                            if (tvUpcomingTime != null) tvUpcomingTime.setText("08:00 AM"); 
+                            if (tvUpcomingTime != null) tvUpcomingTime.setText("সকাল ০৮:০০টা"); 
                             
                             if (upcoming.getImageUri() != null && !upcoming.getImageUri().isEmpty() && ivUpcomingTrip != null) {
                                 Glide.with(HomeFragment.this).load(Uri.parse(upcoming.getImageUri())).into(ivUpcomingTrip);
@@ -191,8 +191,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void showEmptyUpcomingTrip() {
-        if (tvUpcomingDest != null) tvUpcomingDest.setText("No upcoming trips");
-        if (tvUpcomingDates != null) tvUpcomingDates.setText("Plan your next adventure!");
+        if (tvUpcomingDest != null) tvUpcomingDest.setText("আসন্ন কোনো ট্যুর নেই");
+        if (tvUpcomingDates != null) tvUpcomingDates.setText("আপনার পরবর্তী ভ্রমণের পরিকল্পনা করুন!");
         if (ivUpcomingTrip != null) {
             Glide.with(this).load(R.drawable.ic_login_hero).into(ivUpcomingTrip);
             ivUpcomingTrip.setOnClickListener(null);

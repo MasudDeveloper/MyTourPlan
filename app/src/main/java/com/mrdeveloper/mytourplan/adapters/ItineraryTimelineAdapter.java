@@ -15,10 +15,16 @@ import java.util.List;
 
 public class ItineraryTimelineAdapter extends RecyclerView.Adapter<ItineraryTimelineAdapter.TimelineViewHolder> {
 
-    private List<ItineraryItem> items;
+    public interface OnItineraryLongClickListener {
+        void onItineraryLongClick(ItineraryItem item);
+    }
 
-    public ItineraryTimelineAdapter(List<ItineraryItem> items) {
+    private List<ItineraryItem> items;
+    private OnItineraryLongClickListener longClickListener;
+
+    public ItineraryTimelineAdapter(List<ItineraryItem> items, OnItineraryLongClickListener longClickListener) {
         this.items = items;
+        this.longClickListener = longClickListener;
     }
 
     public void setItems(List<ItineraryItem> items) {
@@ -39,6 +45,34 @@ public class ItineraryTimelineAdapter extends RecyclerView.Adapter<ItineraryTime
         holder.tvTime.setText(item.getTime());
         holder.tvActivity.setText(item.getActivity());
         holder.tvLocation.setText(item.getLocation());
+
+        if (position == 0 || items.get(position - 1).getDay() != item.getDay()) {
+            holder.tvDay.setVisibility(View.VISIBLE);
+            holder.tvDay.setText(formatBengaliDay(item.getDay()));
+        } else {
+            holder.tvDay.setVisibility(View.GONE);
+        }
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItineraryLongClick(item);
+            }
+            return true;
+        });
+    }
+
+    private String formatBengaliDay(int day) {
+        String dayStr = String.valueOf(day);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < dayStr.length(); i++) {
+            char c = dayStr.charAt(i);
+            if (c >= '0' && c <= '9') {
+                sb.append((char) (c - '0' + '০'));
+            } else {
+                sb.append(c);
+            }
+        }
+        return "দিন " + sb.toString();
     }
 
     @Override
@@ -47,10 +81,11 @@ public class ItineraryTimelineAdapter extends RecyclerView.Adapter<ItineraryTime
     }
 
     static class TimelineViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTime, tvActivity, tvLocation;
+        TextView tvDay, tvTime, tvActivity, tvLocation;
 
         public TimelineViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvDay = itemView.findViewById(R.id.tvDay);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvActivity = itemView.findViewById(R.id.tvActivity);
             tvLocation = itemView.findViewById(R.id.tvLocation);

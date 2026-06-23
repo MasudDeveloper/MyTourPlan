@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "সবগুলো ফিল্ড পূরণ করুন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -83,13 +83,13 @@ public class LoginActivity extends AppCompatActivity {
         Call<AuthResponse> call = apiService.login(new LoginRequest(email, password));
 
         btnLogin.setEnabled(false);
-        btnLogin.setText("Logging in...");
+        btnLogin.setText("লগইন করা হচ্ছে...");
 
         call.enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("Login ➔");
+                btnLogin.setText("লগইন ➔");
 
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse authResponse = response.body();
@@ -100,13 +100,13 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finishAffinity();
                         } else {
-                            Toast.makeText(LoginActivity.this, "User data not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "ব্যবহারকারীর তথ্য পাওয়া যায়নি", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(LoginActivity.this, authResponse.getError(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Login failed. Incorrect credentials.", Toast.LENGTH_SHORT)
+                    Toast.makeText(LoginActivity.this, "লগইন ব্যর্থ হয়েছে। সঠিক তথ্য প্রদান করুন।", Toast.LENGTH_SHORT)
                             .show();
                 }
             }
@@ -114,8 +114,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("Login ➔");
-                Toast.makeText(LoginActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnLogin.setText("লগইন ➔");
+                Toast.makeText(LoginActivity.this, "নেটওয়ার্ক ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

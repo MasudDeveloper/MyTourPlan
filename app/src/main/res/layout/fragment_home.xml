@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Welcome back,"
+            android:text="ফিরে আসার জন্য স্বাগতম,"
             android:textColor="@color/textColorPrimary"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -106,7 +106,7 @@
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
-                            android:text="NEW ADVENTURE"
+                            android:text="নতুন অভিযান"
                             android:textColor="@color/surfaceColor"
                             android:textSize="10sp"
                             android:textStyle="bold" />
@@ -116,7 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="Plan a New Trip"
+                        android:text="নতুন ট্যুর পরিকল্পনা"
                         android:textColor="@color/surfaceColor"
                         android:textSize="26sp"
                         android:textStyle="bold" />
@@ -125,7 +125,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:text="Our AI-powered navigator is ready to build your perfect custom itinerary in seconds."
+                        android:text="আমাদের কাস্টম এআই জেনারেটর সেকেন্ডের মধ্যে ভ্রমণ পরিকল্পনা তৈরি করতে প্রস্তুত।"
                         android:textColor="#E0E0E0"
                         android:textSize="12sp" />
 
@@ -134,7 +134,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/primaryColor"
-                        android:text="Start Planning"
+                        android:text="পরিকল্পনা শুরু করুন"
                         app:cornerRadius="20dp" />
                 </LinearLayout>
             </FrameLayout>
@@ -178,7 +178,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="My Trips"
+                        android:text="আমার ভ্রমণসমূহ"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -215,7 +215,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Explore"
+                        android:text="এক্সপ্লোর"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -249,7 +249,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bookings"
+                        android:text="বুকিং"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -286,7 +286,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Saved"
+                        android:text="সংরক্ষিত"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -306,7 +306,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Upcoming Trip"
+                android:text="আসন্ন ট্যুর"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -315,7 +315,7 @@
                 android:id="@+id/tvViewAllUpcoming"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View All"
+                android:text="সব দেখুন"
                 android:textColor="@color/primaryColor"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -381,7 +381,7 @@
                         android:background="#E8F5E9"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
-                        android:text="Hotels Confirmed"
+                        android:text="হোটেল কনফার্ম"
                         android:textColor="@color/successColor"
                         android:textSize="10sp" />
 
@@ -391,7 +391,7 @@
                         android:background="#FFF3E0"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
-                        android:text="In Progress"
+                        android:text="চলতি"
                         android:textColor="#E65100"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -418,7 +418,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TIME"
+                            android:text="সময়"
                             android:textColor="@color/textColorMuted"
                             android:textSize="10sp"
                             android:textStyle="bold" />
@@ -448,7 +448,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="MEMBERS"
+                            android:text="মেম্বার"
                             android:textColor="@color/textColorMuted"
                             android:textSize="10sp"
                             android:textStyle="bold" />
@@ -478,7 +478,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="BUDGET"
+                            android:text="বাজেট"
                             android:textColor="@color/textColorMuted"
                             android:textSize="10sp"
                             android:textStyle="bold" />

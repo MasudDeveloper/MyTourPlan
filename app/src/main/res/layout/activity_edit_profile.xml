@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Edit Profile"
+                android:text="প্রোফাইল সংশোধন"
                 android:textColor="@android:color/white"
                 android:textSize="22sp"
                 android:textStyle="bold"
@@ -93,7 +93,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Full Name"
+                android:text="পুরো নাম"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -118,7 +118,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email Address"
+                android:text="ইমেইল এড্রেস"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -144,7 +144,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone Number"
+                android:text="মোবাইল নম্বর"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -187,7 +187,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Travel Bio"
+                android:text="ভ্রমণ বায়ো/পরিচিতি"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -216,7 +216,7 @@
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Save Changes"
+                android:text="সংরক্ষণ করুন"
                 android:textAllCaps="false"
                 android:textSize="16sp"
                 android:textStyle="bold"

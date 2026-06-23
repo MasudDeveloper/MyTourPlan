@@ -85,11 +85,19 @@ public class ProfileFragment extends Fragment {
         }
 
         view.findViewById(R.id.btnLogout).setOnClickListener(v -> {
-            if (getActivity() != null) {
-                sharedPrefs.clearSession();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();
-            }
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("লগআউট")
+                .setMessage("আপনি কি নিশ্চিতভাবে লগআউট করতে চান?")
+                .setPositiveButton("হ্যাঁ", (dialog, which) -> {
+                    if (getActivity() != null) {
+                        sharedPrefs.clearSession();
+                        Toast.makeText(getContext(), "লগআউট সফল হয়েছে", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
+                        getActivity().finish();
+                    }
+                })
+                .setNegativeButton("না", null)
+                .show();
         });
 
         return view;
@@ -138,7 +146,7 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(getContext(), data.getError(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    String errorMsg = "Failed to sync profile data (HTTP " + response.code() + ")";
+                    String errorMsg = "প্রোফাইল তথ্য সিঙ্ক করতে ব্যর্থ হয়েছে (HTTP " + response.code() + ")";
                     try {
                         if (response.errorBody() != null) {
                             errorMsg += ": " + response.errorBody().string();
@@ -151,7 +159,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(Call<ProfileResponse> call, Throwable t) {
                 if (!isAdded() || getContext() == null) return;
-                Toast.makeText(getContext(), "Sync error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "সিঙ্ক ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

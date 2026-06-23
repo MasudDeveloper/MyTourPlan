@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
@@ -41,6 +42,9 @@ public class AddExpenseActivity extends AppCompatActivity {
             return insets;
         });
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         sharedPrefs = new SharedPrefs(this);
         tripId = getIntent().getIntExtra("trip_id", -1);
 
@@ -58,7 +62,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         btnSaveExpense = findViewById(R.id.btnSaveExpense);
         
         if (expenseId != null) {
-            btnSaveExpense.setText("Update Expense");
+            btnSaveExpense.setText("খরচ আপডেট করুন");
             etCategory.setText(getIntent().getStringExtra("category"));
             etAmount.setText(String.valueOf(getIntent().getDoubleExtra("amount", 0.0)));
             etNote.setText(getIntent().getStringExtra("note"));
@@ -85,7 +89,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         }
 
         btnSaveExpense.setEnabled(false);
-        btnSaveExpense.setText("Saving...");
+        btnSaveExpense.setText("সংরক্ষণ করা হচ্ছে...");
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String token = sharedPrefs.getToken();
@@ -102,7 +106,7 @@ public class AddExpenseActivity extends AppCompatActivity {
                     finish();
                 } else {
                     btnSaveExpense.setEnabled(true);
-                    btnSaveExpense.setText(expenseId != null ? "Update Expense" : "Save Expense");
+                    btnSaveExpense.setText(expenseId != null ? "খরচ আপডেট করুন" : "সেভ করুন");
                     Toast.makeText(AddExpenseActivity.this, "খরচ সেভ করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -110,7 +114,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 btnSaveExpense.setEnabled(true);
-                btnSaveExpense.setText(expenseId != null ? "Update Expense" : "Save Expense");
+                btnSaveExpense.setText(expenseId != null ? "খরচ আপডেট করুন" : "সেভ করুন");
                 Toast.makeText(AddExpenseActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

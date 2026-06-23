@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create Account"
+            android:text="অ্যাকাউন্ট তৈরি করুন"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/textColorPrimary"
@@ -35,7 +35,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start planning your dream trip today"
+            android:text="আজই শুরু করুন আপনার স্বপ্নের ভ্রমণ পরিকল্পনা"
             android:textSize="14sp"
             android:textColor="@color/textColorMuted"
             android:fontFamily="sans-serif"
@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Full Name"
+                    android:text="পুরো নাম"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -74,7 +74,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_input"
-                    android:hint="John Doe"
+                    android:hint="যেমন: মাসুম বিল্লাহ"
                     android:inputType="textPersonName"
                     android:padding="14dp"
                     android:textSize="14sp"
@@ -88,7 +88,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email Address"
+                    android:text="ইমেইল এড্রেস"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -114,7 +114,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Phone Number"
+                    android:text="মোবাইল নম্বর"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -158,7 +158,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Password"
+                    android:text="পাসওয়ার্ড"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -184,7 +184,7 @@
                 <CheckBox
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="I agree to the Terms &amp; Conditions"
+                    android:text="আমি নিয়ম ও শর্তাবলীতে সম্মত আছি"
                     android:textSize="13sp"
                     android:textColor="@color/textColorPrimary"
                     android:fontFamily="sans-serif"
@@ -195,7 +195,7 @@
                     android:id="@+id/btnRegister"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Sign Up"
+                    android:text="নিবন্ধন করুন"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
@@ -214,7 +214,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginBottom="20dp">
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OR CONTINUE WITH" android:textSize="10sp" android:textColor="@color/textColorMuted" android:letterSpacing="0.05" android:layout_marginHorizontal="16dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="অথবা অন্যান্য মাধ্যম" android:textSize="10sp" android:textColor="@color/textColorMuted" android:letterSpacing="0.05" android:layout_marginHorizontal="16dp"/>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
                 </LinearLayout>
 
@@ -257,14 +257,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already have an account? "
+                android:text="ইতিমধ্যে অ্যাকাউন্ট আছে? "
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"/>
             <TextView
                 android:id="@+id/tvLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Login"
+                android:text="লগইন করুন"
                 android:textColor="@color/primaryColor"
                 android:textSize="14sp"
                 android:textStyle="bold"

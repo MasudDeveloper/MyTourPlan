@@ -25,11 +25,11 @@ public class PlanTripFragment extends Fragment {
         });
 
         view.findViewById(R.id.cvExploreTemplates).setOnClickListener(v -> {
-            android.widget.Toast.makeText(getContext(), "Explore Templates feature coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(getContext(), "টেমপ্লেট এক্সপ্লোরার শীঘ্রই আসছে!", android.widget.Toast.LENGTH_SHORT).show();
         });
 
         view.findViewById(R.id.cvJoinTour).setOnClickListener(v -> {
-            android.widget.Toast.makeText(getContext(), "Join Tour feature coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(getContext(), "ট্যুরে যোগ দেওয়ার ফিচারটি শীঘ্রই আসছে!", android.widget.Toast.LENGTH_SHORT).show();
         });
         
         return view;

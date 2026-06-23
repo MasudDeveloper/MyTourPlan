@@ -81,7 +81,7 @@ public class EditProfileActivity extends AppCompatActivity {
         etProfileName.setText(sharedPrefs.getUserName() != null ? sharedPrefs.getUserName() : "");
         etProfileEmail.setText(sharedPrefs.getUserEmail() != null ? sharedPrefs.getUserEmail() : "");
         etProfilePhone.setText(sharedPrefs.getUserPhone() != null ? sharedPrefs.getUserPhone() : "");
-        etTravelBio.setText("Lover of beaches and mountains. Exploring the beauty of Bangladesh.");
+        etTravelBio.setText("সমুদ্র ও পাহাড়প্রেমী। বাংলাদেশের সৌন্দর্য উপভোগ করছি।");
 
         String cachedPic = sharedPrefs.getProfilePic();
         if (cachedPic != null && !cachedPic.isEmpty()) {
@@ -131,17 +131,17 @@ public class EditProfileActivity extends AppCompatActivity {
         String phone = etProfilePhone.getText().toString().trim();
 
         if (name.isEmpty()) {
-            etProfileName.setError("Name is required");
+            etProfileName.setError("নাম আবশ্যক");
             return;
         }
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Internet connection required to save profile changes", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "প্রোফাইল পরিবর্তন সংরক্ষণ করার জন্য ইন্টারনেট সংযোগ প্রয়োজন", Toast.LENGTH_SHORT).show();
             return;
         }
 
         btnSaveProfile.setEnabled(false);
-        btnSaveProfile.setText("Saving Changes...");
+        btnSaveProfile.setText("সংরক্ষণ করা হচ্ছে...");
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String token = sharedPrefs.getToken();
@@ -174,11 +174,11 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SyncGenericResponse> call, Response<SyncGenericResponse> response) {
                 btnSaveProfile.setEnabled(true);
-                btnSaveProfile.setText("Save Changes");
+                btnSaveProfile.setText("সংরক্ষণ করুন");
                 if (response.isSuccessful() && response.body() != null) {
                     SyncGenericResponse data = response.body();
                     if (data.isSuccess()) {
-                        Toast.makeText(EditProfileActivity.this, "Profile Updated Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditProfileActivity.this, "প্রোফাইল সফলভাবে আপডেট করা হয়েছে", Toast.LENGTH_SHORT).show();
                         
                         // Cache updated info locally in SharedPrefs instantly
                         sharedPrefs.saveUserSession(token, sharedPrefs.getUserId(), name, sharedPrefs.getUserEmail(), phone);
@@ -188,11 +188,11 @@ public class EditProfileActivity extends AppCompatActivity {
                         
                         finish();
                     } else {
-                        String error = data.getError() != null && !data.getError().isEmpty() ? data.getError() : "Failed to update profile";
+                        String error = data.getError() != null && !data.getError().isEmpty() ? data.getError() : "প্রোফাইল আপডেট করা যায়নি";
                         Toast.makeText(EditProfileActivity.this, error, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    String errorMsg = "Failed to update profile (HTTP " + response.code() + ")";
+                    String errorMsg = "প্রোফাইল আপডেট ব্যর্থ হয়েছে (HTTP " + response.code() + ")";
                     try {
                         if (response.errorBody() != null) {
                             errorMsg += ": " + response.errorBody().string();
@@ -205,8 +205,8 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<SyncGenericResponse> call, Throwable t) {
                 btnSaveProfile.setEnabled(true);
-                btnSaveProfile.setText("Save Changes");
-                Toast.makeText(EditProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnSaveProfile.setText("সংরক্ষণ করুন");
+                Toast.makeText(EditProfileActivity.this, "ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

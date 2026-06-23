@@ -28,7 +28,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tour Planner"
+                    android:text="ট্যুর প্ল্যানার"
                     android:textColor="#B3FFFFFF"
                     android:textSize="14sp"
                     android:letterSpacing="0.1"
@@ -38,7 +38,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Plan Your Next\nGreat Adventure"
+                    android:text="আপনার পরবর্তী ভ্রমণের\nপরিকল্পনা করুন"
                     android:textColor="@android:color/white"
                     android:textSize="32sp"
                     android:textStyle="bold"
@@ -48,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Create an itinerary, track expenses, and manage members all in one place."
+                    android:text="একই স্থানে ট্যুর ভ্রমণসূচী তৈরি করুন, খরচ ট্র্যাক করুন এবং মেম্বারদের পরিচালনা করুন।"
                     android:textColor="#E2E8F0"
                     android:textSize="15sp"
                     android:lineSpacingExtra="2dp" />
@@ -107,7 +107,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Create Custom Tour"
+                            android:text="কাস্টম ট্যুর তৈরি করুন"
                             android:textColor="#0F172A"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -116,7 +116,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Start from scratch and build your perfect itinerary"
+                            android:text="নতুনভাবে শুরু করুন এবং আপনার নিখুঁত ভ্রমণসূচী তৈরি করুন"
                             android:textColor="#64748B"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -176,7 +176,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Explore\nTemplates"
+                            android:text="টেমপ্লেট\nএক্সপ্লোর করুন"
                             android:textColor="#334155"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -223,7 +223,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Join an\nExisting Tour"
+                            android:text="চলতি কোনো\nট্যুরে যোগ দিন"
                             android:textColor="#334155"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -237,7 +237,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Recent Drafts"
+                android:text="সাম্প্রতিক ড্রাফটসমূহ"
                 android:textColor="#0F172A"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -268,7 +268,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No recent drafts found"
+                        android:text="কোনো সাম্প্রতিক ড্রাফট পাওয়া যায়নি"
                         android:textColor="#64748B"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -277,7 +277,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Start a new plan to see it here"
+                        android:text="এখানে দেখতে নতুন একটি পরিকল্পনা শুরু করুন"
                         android:textColor="#94A3B8"
                         android:textSize="13sp" />
 

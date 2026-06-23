@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#F8FAFC">
+    android:background="@drawable/bg_screen_gradient">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Dates"
+                    android:text="তারিখ"
                     android:textColor="#E2E8F0"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -72,7 +72,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_back" />
+                app:navigationIcon="@drawable/ic_back"
+                app:navigationIconTint="@android:color/white" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -101,12 +102,13 @@
                 android:layout_marginBottom="24dp"
                 app:cardElevation="4dp"
                 app:cardCornerRadius="24dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_card_gradient_blue"
+                    android:background="@drawable/bg_budget_card"
                     android:orientation="vertical"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="24dp">
@@ -124,7 +126,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TOTAL BUDGET"
+                                android:text="মোট বাজেট"
                                 android:textColor="#B3FFFFFF"
                                 android:textSize="12sp"
                                 android:letterSpacing="0.05"
@@ -139,6 +141,16 @@
                                 android:textColor="@android:color/white"
                                 android:textSize="26sp"
                                 android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvRemainingBudget"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="অবশিষ্ট: ৳0.00"
+                                android:textColor="#E2E8F0"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -151,7 +163,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="MEMBERS"
+                                android:text="মেম্বার"
                                 android:textColor="#B3FFFFFF"
                                 android:textSize="12sp"
                                 android:letterSpacing="0.05"
@@ -189,7 +201,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Budget Spent"
+                            android:text="খরচ হয়েছে"
                             android:textColor="#E0E0E0"
                             android:textSize="14sp" />
 
@@ -215,153 +227,229 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Navigation Actions Grid -->
+            <!-- Navigation Actions Grid (2x2 Grid) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
-                android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:orientation="vertical">
 
-                <!-- Members Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnGroupMembers"
-                    android:layout_width="0dp"
+                <!-- Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#F1F5F9">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Members Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnGroupMembers"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingVertical="20dp">
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E6F0FD"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="12dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_circle"
-                                android:backgroundTint="#F1F5F9" />
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_user"
-                                app:tint="#0F172A" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Members"
-                            android:textColor="#334155"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="20dp">
 
-                <!-- Itinerary Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnViewItinerary"
-                    android:layout_width="0dp"
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginBottom="12dp">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/bg_circle"
+                                    android:backgroundTint="#EBF3FC" />
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_user"
+                                    app:tint="@color/primaryColor" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="মেম্বার"
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Itinerary Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnViewItinerary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/secondaryLightColor"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="20dp">
+
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginBottom="12dp">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/bg_circle"
+                                    android:backgroundTint="@color/secondaryLightColor" />
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_calendar"
+                                    app:tint="@color/secondaryColor" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="প্ল্যান"
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Row 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#F1F5F9">
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Calculate Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnCalculate"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingVertical="20dp">
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E8F5E9"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="12dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_circle"
-                                android:backgroundTint="#F0FDF4" />
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_calendar"
-                                app:tint="#0F172A" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Itinerary"
-                            android:textColor="#334155"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="20dp">
 
-                <!-- Calculate Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnCalculate"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#F1F5F9">
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginBottom="12dp">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/bg_circle"
+                                    android:backgroundTint="#E8F5E9" />
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_dashboard_budget"
+                                    app:tint="@color/successColor" />
+                            </FrameLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="হিসাব-নিকাশ"
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Notes & Checklist Card (Purple Theme) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnTripNotes"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingVertical="20dp">
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#F3E8FF"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="12dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_circle"
-                                android:backgroundTint="#FFF7ED" />
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_edit"
-                                app:tint="#0F172A" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Calculate"
-                            android:textColor="#334155"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="20dp">
+
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginBottom="12dp">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/bg_circle"
+                                    android:backgroundTint="#F5F3FF" />
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_checklist"
+                                    app:tint="#7C3AED" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="নোট ও চেকলিস্ট"
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Recent Expenses Title -->
@@ -376,8 +464,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Recent Expenses"
-                    android:textColor="#0F172A"
+                    android:text="সাম্প্রতিক খরচ"
+                    android:textColor="@color/textColorPrimary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -385,7 +473,7 @@
                     android:id="@+id/btnAddExpense"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="View All"
+                    android:text="যোগ করুন"
                     android:textColor="@color/primaryColor"
                     android:textStyle="bold"
                     android:textSize="14sp" />
@@ -403,8 +491,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="40dp"
-                    android:text="No expenses recorded yet."
-                    android:textColor="#94A3B8"
+                    android:text="এখনো কোনো খরচ রেকর্ড করা হয়নি।"
+                    android:textColor="@color/textColorMuted"
                     android:textSize="15sp" />
 
             </LinearLayout>

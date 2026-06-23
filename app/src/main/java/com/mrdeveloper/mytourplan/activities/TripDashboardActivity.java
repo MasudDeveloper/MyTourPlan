@@ -36,8 +36,8 @@ import java.util.List;
 
 public class TripDashboardActivity extends AppCompatActivity {
 
-    private TextView tvTotalBudget, tvMembers, tvEmptyState, tvBudgetPercentage, tvTripDates;
-    private View btnAddExpense, btnCalculate, btnViewItinerary, btnGroupMembers, fabAddExpense;
+    private TextView tvTotalBudget, tvMembers, tvEmptyState, tvBudgetPercentage, tvTripDates, tvRemainingBudget;
+    private View btnAddExpense, btnCalculate, btnViewItinerary, btnGroupMembers, fabAddExpense, btnTripNotes;
     private LinearLayout layoutExpenseList;
     private android.widget.ProgressBar budgetProgress;
     private ImageView ivDashboardCover;
@@ -56,11 +56,13 @@ public class TripDashboardActivity extends AppCompatActivity {
         tvTotalBudget = findViewById(R.id.tvTotalBudget);
         tvMembers = findViewById(R.id.tvMembers);
         tvEmptyState = findViewById(R.id.tvEmptyState);
+        tvRemainingBudget = findViewById(R.id.tvRemainingBudget);
         layoutExpenseList = findViewById(R.id.layoutExpenseList);
         btnAddExpense = findViewById(R.id.btnAddExpense);
         btnCalculate = findViewById(R.id.btnCalculate);
         btnViewItinerary = findViewById(R.id.btnViewItinerary);
         btnGroupMembers = findViewById(R.id.btnGroupMembers);
+        btnTripNotes = findViewById(R.id.btnTripNotes);
         fabAddExpense = findViewById(R.id.fabAddExpense);
         
         tvBudgetPercentage = findViewById(R.id.tvBudgetPercentage);
@@ -101,6 +103,12 @@ public class TripDashboardActivity extends AppCompatActivity {
 
         btnViewItinerary.setOnClickListener(v -> {
             Intent intent = new Intent(TripDashboardActivity.this, ItineraryActivity.class);
+            intent.putExtra("trip_id", String.valueOf(tripId));
+            startActivity(intent);
+        });
+
+        btnTripNotes.setOnClickListener(v -> {
+            Intent intent = new Intent(TripDashboardActivity.this, TripNotesActivity.class);
             intent.putExtra("trip_id", String.valueOf(tripId));
             startActivity(intent);
         });
@@ -212,6 +220,17 @@ public class TripDashboardActivity extends AppCompatActivity {
                             }
                             tvBudgetPercentage.setText(progress + "% (৳" + String.format("%.0f", totalExpense) + ")");
                             budgetProgress.setProgress(progress);
+
+                            double remainingBudget = totalBudget - totalExpense;
+                            if (tvRemainingBudget != null) {
+                                if (remainingBudget >= 0) {
+                                    tvRemainingBudget.setText("অবশিষ্ট: ৳" + String.format("%.2f", remainingBudget));
+                                    tvRemainingBudget.setTextColor(android.graphics.Color.parseColor("#E2E8F0"));
+                                } else {
+                                    tvRemainingBudget.setText("অতিরিক্ত খরচ: ৳" + String.format("%.2f", Math.abs(remainingBudget)));
+                                    tvRemainingBudget.setTextColor(android.graphics.Color.parseColor("#EF4444"));
+                                }
+                            }
                         }
                     } else {
                         Toast.makeText(TripDashboardActivity.this, data.getError(), Toast.LENGTH_SHORT).show();

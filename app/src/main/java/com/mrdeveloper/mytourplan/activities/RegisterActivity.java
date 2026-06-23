@@ -58,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "সবগুলো ফিল্ড পূরণ করুন", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -66,18 +66,18 @@ public class RegisterActivity extends AppCompatActivity {
         Call<AuthResponse> call = apiService.register(new RegisterRequest(name, email, phone, password));
 
         btnRegister.setEnabled(false);
-        btnRegister.setText("Signing Up...");
+        btnRegister.setText("নিবন্ধন করা হচ্ছে...");
 
         call.enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Sign Up");
+                btnRegister.setText("নিবন্ধন করুন");
                 
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse authResponse = response.body();
                     if (authResponse.getError() == null || authResponse.getError().isEmpty()) {
-                        Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "নিবন্ধন সফল হয়েছে!", Toast.LENGTH_SHORT).show();
                         if (authResponse.getUser() != null) {
                             new SharedPrefs(RegisterActivity.this).saveUserSession(
                                     authResponse.getToken(),
@@ -95,15 +95,15 @@ public class RegisterActivity extends AppCompatActivity {
                         Toast.makeText(RegisterActivity.this, authResponse.getError(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "নিবন্ধন করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Sign Up");
-                Toast.makeText(RegisterActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnRegister.setText("নিবন্ধন করুন");
+                Toast.makeText(RegisterActivity.this, "নেটওয়ার্ক ত্রুটি: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

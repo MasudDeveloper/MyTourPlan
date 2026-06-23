@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome Back"
+            android:text="ফিরে আসার জন্য স্বাগতম"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/textColorPrimary"
@@ -35,7 +35,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign in to continue your adventure"
+            android:text="ভ্রমণ পরিকল্পনা শুরু করতে লগইন করুন"
             android:textSize="14sp"
             android:textColor="@color/textColorMuted"
             android:fontFamily="sans-serif"
@@ -81,7 +81,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email or Username"
+                    android:text="ইমেইল অথবা ইউজারনেম"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -115,7 +115,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Password"
+                        android:text="পাসওয়ার্ড"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="13sp"
                         android:textStyle="bold"
@@ -124,7 +124,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Forgot Password?"
+                        android:text="পাসওয়ার্ড ভুলে গেছেন?"
                         android:textColor="@color/primaryColor"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -151,7 +151,7 @@
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Sign In"
+                    android:text="লগইন করুন"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
@@ -170,7 +170,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginBottom="20dp">
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OR CONTINUE WITH" android:textSize="10sp" android:textColor="@color/textColorMuted" android:letterSpacing="0.05" android:layout_marginHorizontal="16dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="অথবা অন্যান্য মাধ্যম" android:textSize="10sp" android:textColor="@color/textColorMuted" android:letterSpacing="0.05" android:layout_marginHorizontal="16dp"/>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" android:background="#E2E8F0"/>
                 </LinearLayout>
 
@@ -213,14 +213,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't have an account? "
+                android:text="অ্যাকাউন্ট নেই? "
                 android:textColor="@color/textColorPrimary"
                 android:textSize="14sp"/>
             <TextView
                 android:id="@+id/tvRegister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign Up"
+                android:text="নিবন্ধন করুন"
                 android:textColor="@color/primaryColor"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -232,7 +232,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Premium planning starting at only 500 BDT/month."
+            android:text="মাত্র ৫০০ টাকা/মাসে প্রিমিয়াম ভ্রমণ পরিকল্পনা শুরু করুন।"
             android:textColor="@color/textColorMuted"
             android:textSize="10sp"
             android:letterSpacing="0.02"/>

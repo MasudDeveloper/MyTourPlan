@@ -13,6 +13,7 @@ import com.mrdeveloper.mytourplan.models.SaveTripRequest;
 import com.mrdeveloper.mytourplan.models.SyncGenericResponse;
 import com.mrdeveloper.mytourplan.models.SyncTripResponse;
 import com.mrdeveloper.mytourplan.models.TripsResponse;
+import com.mrdeveloper.mytourplan.models.TripNotesResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -127,7 +128,9 @@ public interface ApiService {
             @Field("time") String time,
             @Field("activity") String activity,
             @Field("location") String location,
-            @Field("local_id") String localId
+            @Field("local_id") String localId,
+            @Field("action") String action,
+            @Field("server_id") int serverId
     );
 
     @FormUrlEncoded
@@ -155,5 +158,24 @@ public interface ApiService {
             @Part("name") RequestBody name,
             @Part("phone") RequestBody phone,
             @Part okhttp3.MultipartBody.Part profilePic
+    );
+
+    @GET("get_notes_checklist.php")
+    Call<TripNotesResponse> getNotesChecklist(
+            @Header("Authorization") String token,
+            @Query("trip_id") String tripId
+    );
+
+    @FormUrlEncoded
+    @POST("sync_notes_checklist.php")
+    Call<SyncGenericResponse> syncNotesChecklist(
+            @Header("Authorization") String token,
+            @Field("trip_id") String tripId,
+            @Field("type") String type,
+            @Field("action") String action,
+            @Field("id") int id,
+            @Field("title") String title,
+            @Field("content") String content,
+            @Field("is_checked") int isChecked
     );
 }
